@@ -1,0 +1,40 @@
+include common.mk
+
+PC_CONFIG = -D CORE_TYPE_PC
+
+elfs = $(BUILD_DIR)/zsbl_pc.elf
+
+ld_pc = $(BUILD_DIR)/zsbl_pc.ld
+lds_pc = $(SRC_DIR)/zsbl_pc.lds
+
+a_objs = $(elfs:elf=ao)
+c_objs = $(BUILD_DIR)/zsbl_func.co
+c_objs += $(BUILD_DIR)/plat_ops.co
+
+objs = $(a_objs) $(c_objs)
+
+default: all
+
+all: $(elfs)
+
+clean:
+	rm -rf $(ld_pc)
+	rm -rf $(a_objs)
+	rm -rf $(c_objs)
+	rm -rf $(elfs)
+
+objs: $(a_objs) $(c_objs)
+
+$(ld_pc): $(lds_pc)
+	$(CC) $(CFLAGS) -E -P - < $< -o $@
+
+$(BUILD_DIR)/%.ao : $(SRC_DIR)/%.S
+	mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(MC_CONFIG) -D __ASM__ $< -o $@
+
+$(BUILD_DIR)/%.co : $(SRC_DIR)/%.c
+	mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(MC_CONFIG) $< -o $@
+
+$(BUILD_DIR)/zsbl_pc.elf : $(objs) $(ld_pc)
+	$(CC) $(LDFLAGS) -T$(ld_pc) -o $@ $(objs)

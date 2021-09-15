@@ -8,6 +8,7 @@ CFLAGS += -static
 CFLAGS += -c
 CFLAGS += -Wall
 CFLAGS += -I $(INC_DIR)
+CFLAGS += -I $(SRC_DIR)
 
 LDFLAGS = -nostdlib -nostartfiles
 
