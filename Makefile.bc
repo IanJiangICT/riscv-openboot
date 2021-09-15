@@ -1,0 +1,24 @@
+include common.mk
+
+elfs = $(BUILD_DIR)/bootconf0.elf
+elfs += $(BUILD_DIR)/bootconf1.elf
+elfs += $(BUILD_DIR)/bootconf2.elf
+
+c_objs = $(elfs:elf=o)
+
+default: all
+
+objs: $(c_objs)
+
+all: $(elfs)
+
+clean:
+	rm -rf $(c_objs)
+	rm -rf $(elfs)
+
+$(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
+	mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $< -o $@
+
+$(BUILD_DIR)/%.elf : $(BUILD_DIR)/%.o
+	$(CC) $(LDFLAGS) $< -o $@
