@@ -23,3 +23,6 @@ void zsbl_set_bc_rom(void)
 	plat_bc_fix();	
 	return;
 }
+
+void zsbl_init_console(void) { return ; }
+void zsbl_print_bc(void) { return ; }
