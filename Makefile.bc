@@ -21,4 +21,4 @@ $(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) $< -o $@
 
 $(BUILD_DIR)/%.elf : $(BUILD_DIR)/%.o
-	$(CC) $(LDFLAGS) $< -o $@
+	$(LD) $(LDFLAGS) $< -o $@

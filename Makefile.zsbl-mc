@@ -38,4 +38,4 @@ $(BUILD_DIR)/%.co : $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) $(MC_CONFIG) $< -o $@
 
 $(BUILD_DIR)/zsbl_mc.elf : $(objs) $(ld_mc)
-	$(CC) $(LDFLAGS) -T$(ld_mc) -o $@ $(objs)
+	$(LD) $(LDFLAGS) -T$(ld_mc) -o $@ $(objs)

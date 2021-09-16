@@ -1,14 +1,15 @@
 include common.mk
 
-PC_CONFIG = -D CORE_TYPE_PC
+CFLAGS+=-D FSBL_FUNC
 
-elfs = $(BUILD_DIR)/zsbl_pc.elf
+elfs = $(BUILD_DIR)/fsbl.elf
 
-ld_pc = $(BUILD_DIR)/zsbl_pc.ld
-lds_pc = $(SRC_DIR)/zsbl_pc.lds
+ld = $(BUILD_DIR)/fsbl.ld
+lds = $(SRC_DIR)/fsbl.lds
 
 a_objs = $(elfs:elf=ao)
-c_objs = $(BUILD_DIR)/zsbl_func.co
+c_objs = $(BUILD_DIR)/fsbl_func.co
+c_objs += $(BUILD_DIR)/flash_func.co
 c_objs += $(BUILD_DIR)/plat_ops.co
 
 objs = $(a_objs) $(c_objs)
@@ -18,23 +19,23 @@ default: all
 all: $(elfs)
 
 clean:
-	rm -rf $(ld_pc)
+	rm -rf $(ld)
 	rm -rf $(a_objs)
 	rm -rf $(c_objs)
 	rm -rf $(elfs)
 
 objs: $(a_objs) $(c_objs)
 
-$(ld_pc): $(lds_pc)
+$(ld): $(lds)
 	$(CC) $(CFLAGS) -E -P - < $< -o $@
 
 $(BUILD_DIR)/%.ao : $(SRC_DIR)/%.S
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(MC_CONFIG) -D __ASM__ $< -o $@
+	$(CC) $(CFLAGS) -D __ASM__ $< -o $@
 
 $(BUILD_DIR)/%.co : $(SRC_DIR)/%.c
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(MC_CONFIG) $< -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
-$(BUILD_DIR)/zsbl_pc.elf : $(objs) $(ld_pc)
-	$(LD) $(LDFLAGS) -T$(ld_pc) -o $@ $(objs)
+$(BUILD_DIR)/fsbl.elf : $(objs) $(ld)
+	$(LD) $(LDFLAGS) -T$(ld) -o $@ $(objs)
