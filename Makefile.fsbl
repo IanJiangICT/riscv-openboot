@@ -10,7 +10,10 @@ lds = $(SRC_DIR)/fsbl.lds
 a_objs = $(elfs:elf=ao)
 c_objs = $(BUILD_DIR)/fsbl_func.co
 c_objs += $(BUILD_DIR)/flash_func.co
+c_objs += $(BUILD_DIR)/serial_func.co
 c_objs += $(BUILD_DIR)/plat_ops.co
+c_objs += $(BUILD_DIR)/dw_uart.co
+c_objs += $(BUILD_DIR)/dw_ssi.co
 
 objs = $(a_objs) $(c_objs)
 
