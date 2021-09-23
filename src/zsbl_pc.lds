@@ -5,7 +5,7 @@ ENTRY(_start)
 
 SECTIONS
 {
-	. = PLAT_ROM_PC;
+	. = (PLAT_ROM_BASE + PLAT_ROM_OFFSET_PC);
 	.text.init : { *(.text.init) }
 	. = ALIGN(0x1000);
 	.text : { *(.text) }

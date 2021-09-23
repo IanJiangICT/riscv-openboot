@@ -8,8 +8,8 @@ ld_pc = $(BUILD_DIR)/zsbl_pc.ld
 lds_pc = $(SRC_DIR)/zsbl_pc.lds
 
 a_objs = $(elfs:elf=ao)
-c_objs = $(BUILD_DIR)/zsbl_func.co
-c_objs += $(BUILD_DIR)/plat_ops.co
+#c_objs = $(BUILD_DIR)/zsbl_func.co
+#c_objs += $(BUILD_DIR)/plat_ops.co
 
 objs = $(a_objs) $(c_objs)
 
