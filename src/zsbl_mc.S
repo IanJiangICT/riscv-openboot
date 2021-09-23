@@ -2,7 +2,7 @@
 #include "zsbl_common.h"
 #include "mc_private.h"
 #include "plat_def.h"
-#include "flash_func.h"
+#include "storage_func.h"
 
 .section .text.init;
 .align	6;
@@ -30,11 +30,11 @@ stack_setup:
 
 call_funcs:
 	call	zsbl_set_bc_rom
-	call	flash_init
-	call	flash_set_bc
+	call	storage_init
+	call	storage_load_bc
 	call	zsbl_init_console
 	call	zsbl_print_bc
-	call	flash_load_fsbl
+	call	storage_load_fsbl
 
 goto_fsbl:
 	li		t0,	PLAT_RAM_FSBL

@@ -1,6 +1,6 @@
 #include "plat_def.h"
 #include "plat_ops.h"
-#include "flash_func.h"
+#include "storage_func.h"
 
 /* Per socket stage */
 #define FSBL_STAGE_CHIPLINK_START 		1
@@ -115,7 +115,7 @@ _end_sz_init:
 	fence
 	fence.i
 
-	call	flash_load_opensbi
+	call	storage_load_opensbi
 
 	la		t0,	_pc_stage
 	li		t1,	FSBL_STAGE_OPENSBI_LOAD_END

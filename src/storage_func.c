@@ -37,44 +37,48 @@ static void flash_load_part(int part_num, uint8_t *load_to)
 	return;
 }
 
-void flash_init(void)
+void storage_init(void)
 {
-	plat_flash_init();
+	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
+	if (bc->storage_online & (BC_STORAGE_FLASH_0 | BC_STORAGE_FLASH_I)) {
+		plat_flash_init();
+	}
 	return;
 }
 
-void flash_set_bc(void)
+void storage_load_bc(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
-	uint8_t *dst = (uint8_t *)PLAT_RAM_FSBL;
 
-	/* Keep using current bootconf, which is copied from ROM before */
-	if (bc->conf_at == BC_CONF_AT_ROM) {
+	/* Keep using current bootconf, which is copied from ROM before (in zsbl_set_bc_rom()) */
+	if (bc->storage_bc == BC_STORAGE_ROM_ONCHIP || bc->storage_bc == BC_STORAGE_ROM_OFFCHIP) {
 		return;
 	}
 
-	flash_load_part(GPT_PART_BOOTCONF, (uint8_t *)bc);
+	if (bc->storage_bc == BC_STORAGE_FLASH_0 || bc->storage_bc == BC_STORAGE_FLASH_I) {
+		flash_load_part(GPT_PART_BOOTCONF, (uint8_t *)bc);
+	}
 	plat_bc_fix();
 	return;
 }
 
-void flash_load_fsbl(void)
+void storage_load_fsbl(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
 	uint8_t *dst = (uint8_t *)PLAT_RAM_FSBL;
 
-	if (bc->load_fsbl) {
+	if (bc->storage_fsbl == BC_STORAGE_FLASH_0 || bc->storage_fsbl == BC_STORAGE_FLASH_I) {
 		flash_load_part(GPT_PART_FSBL, dst);
 	}
 	return;
 }
 
-void flash_load_opensbi(void)
+void storage_load_opensbi(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
 	uint8_t *dst = (uint8_t *)PLAT_DDR_OPENSBI;
 
-	if (bc->load_opensbi) {
+	if (bc->storage_opensbi == BC_STORAGE_FLASH_0 || bc->storage_opensbi == BC_STORAGE_FLASH_I) {
 		flash_load_part(GPT_PART_OPENSBI, dst);
 	}
 	return;

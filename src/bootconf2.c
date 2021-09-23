@@ -6,15 +6,27 @@
 
 #define SOCKET_CNT 2
 
+#define THIS_STORAGE_ONLINE ( \
+	BC_STORAGE_ROM_ONCHIP \
+	| BC_STORAGE_RAM_ONCHIP \
+	| BC_STORAGE_DDR \
+	| BC_STORAGE_FLASH_I \
+	)
+#define THIS_STORAGE_BC 		BC_STORAGE_ROM_ONCHIP
+#define THIS_STORAGE_FSBL 		BC_STORAGE_RAM_ONCHIP
+#define THIS_STORAGE_OPENSBI	BC_STORAGE_DDR
+#define THIS_BOOT_START			BC_STORAGE_ROM_ONCHIP
+
 unsigned char _start[0]; /* Defined to avoid link warning */
 
 struct bootconf bootconf1 = {
 	.conf_size		= sizeof(struct bootconf) + sizeof(uint32_t) * SOCKET_CNT,
-	.boot_start		= BC_BOOT_START_ROM,
-	.conf_at		= BC_CONF_AT_ROM,
+	.boot_start		= THIS_BOOT_START,
 	.work_mode		= BC_WORK_MODE_VZEBU,
-	.load_fsbl		= 0,
-	.load_opensbi	= 0,
+	.storage_online	= THIS_STORAGE_ONLINE,
+	.storage_bc		= THIS_STORAGE_BC,
+	.storage_fsbl	= THIS_STORAGE_FSBL,
+	.storage_opensbi= THIS_STORAGE_OPENSBI,
 	.enable_console	= 1,
 	.enable_ddrctrl	= 1,
 	.socket_cnt		= 2,
