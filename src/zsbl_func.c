@@ -26,5 +26,24 @@ void zsbl_set_bc_rom(void)
 	return;
 }
 
-void zsbl_init_console(void) { return ; }
-void zsbl_print_bc(void) { return ; }
+void zsbl_init_console(void)
+{
+	serial_init();
+	serial_print_str("ZSBL\n");
+	return;
+}
+
+void zsbl_print_bc(void)
+{
+	uint32_t *bc = (uint32_t *)PLAT_RAM_BC;
+	int	u32_cnt = (*bc)/sizeof(uint32_t);
+	int i;
+
+	serial_print_str("bc\n");
+	for (i = 0; i < u32_cnt; i++) {
+		serial_print_hex_u32(bc[i]);
+		serial_print_str("\n");
+	}
+
+	return;
+}
