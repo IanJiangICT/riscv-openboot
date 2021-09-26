@@ -1,5 +1,6 @@
 #include "simple_types.h"
 #include "bootconf.h"
+#include "serial_func.h"
 #include "plat_ops.h"
 #include "plat_def.h"
 
