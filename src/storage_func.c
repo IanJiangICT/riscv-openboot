@@ -15,7 +15,7 @@ static void rom_offchip_read(unsigned int offset, unsigned char *buf, unsigned i
 	return;
 }
 
-static void gpt_load_part(int part_num, uint8_t *load_to, uint32_t storage)
+static uint32_t gpt_load_part(int part_num, uint8_t *load_to, uint32_t storage)
 {
 	uint32_t entry_offset;
 	uint32_t entry_size;
@@ -31,7 +31,7 @@ static void gpt_load_part(int part_num, uint8_t *load_to, uint32_t storage)
 	serial_print_str("storage: ");
 	if (storage == 0) {
 		serial_print_str(" null\n");
-		return;
+		return 0;
 	} else if (storage == BC_STORAGE_FLASH_0 || storage == BC_STORAGE_FLASH_I) {
 		storage_offset = 0;
 		storage_read = &plat_flash_read;
@@ -47,7 +47,7 @@ static void gpt_load_part(int part_num, uint8_t *load_to, uint32_t storage)
 	} else {
 		serial_print_hex_u32(storage);
 		serial_print_str(" not supported \n");
-		return;
+		return 0;
 	}
 
 	print_str[0] += part_num;
@@ -67,7 +67,7 @@ static void gpt_load_part(int part_num, uint8_t *load_to, uint32_t storage)
 
 	storage_read((unsigned int)(storage_offset + this_offset), load_to, this_size);
 
-	return;
+	return (this_size - pad_size);
 }
 
 void storage_init(void)
