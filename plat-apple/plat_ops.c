@@ -117,8 +117,57 @@ void plat_flash_read(unsigned int offset, unsigned char *buf, unsigned int size)
 void plat_sd_init(void) { return; }
 void plat_sd_read_byte(unsigned int offset, unsigned char *buf) { return; }
 void plat_sd_read(unsigned int offset, unsigned char *buf, unsigned int size) { return; }
-void plat_serial_init(void) { return; }
-void plat_serial_put_byte(unsigned char data) { return; }
+
+#include "dw_uart.h"
+void plat_serial_init(void)
+{
+	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
+	volatile void *tlmm_base;
+	volatile void *uart_base;
+	uint32_t val;
+
+	/* Configure TLMM for UART0/1/2/3 */
+	if (bc->socket_id == 0) {
+		tlmm_base = (void *)PLAT_TLMM_BASE;
+	} else {
+		tlmm_base = (void *)PLAT_TLMM_BASE + PLAT_SOCKET_OFFSET;
+	}
+	val = 0x00000009;
+	writel(val, tlmm_base + 216);
+	writel(val, tlmm_base + 220);
+	writel(val, tlmm_base + 248);
+	writel(val, tlmm_base + 252);
+	writel(val, tlmm_base + 280);
+	writel(val, tlmm_base + 284);
+	writel(val, tlmm_base + 312);
+	writel(val, tlmm_base + 316);
+
+	/* Initiate UART0 */
+	if (bc->socket_id == 0) {
+		uart_base = (void *)PLAT_UART0_BASE;
+	} else {
+		uart_base = (void *)PLAT_UART0_BASE + PLAT_SOCKET_OFFSET;
+	}
+	dw_uart_init(uart_base, bc->uart_freq_div0);
+
+	return;
+}
+
+void plat_serial_put_byte(unsigned char data)
+{
+	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
+	volatile void *uart_base;
+
+	if (bc->socket_id == 0) {
+		uart_base = (void *)PLAT_UART0_BASE;
+	} else {
+		uart_base = (void *)PLAT_UART0_BASE + PLAT_SOCKET_OFFSET;
+	}
+	dw_uart_put_byte(uart_base, data);
+
+	return;
+}
+
 void plat_clock_init(void) { return; }
 void plat_start_pc(void) { return; }
 void plat_setup_pg(void) { return; }
