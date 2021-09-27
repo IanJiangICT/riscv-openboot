@@ -1,6 +1,7 @@
 #include "bootconf.h"
 #include "simple_types.h"
 #include "riscv_mmio.h"
+#include "serial_func.h"
 #include "plat_def.h"
 
 void plat_bc_fix(void)
@@ -168,10 +169,103 @@ void plat_serial_put_byte(unsigned char data)
 	return;
 }
 
-void plat_clock_init(void) { return; }
+#ifdef FSBL_FUNC
+void plat_clock_init(void)
+{
+	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
+	volatile void *addr;
+	volatile void *uart_base;
+	uint32_t val;
+	uint32_t addr_h;
+	int i;
+	uint32_t conf_addr_val [] = {
+		(0x60000000 + 0x18),	0x1943,
+		(0x02100000 + 0x18),	0x1923,
+		(0x01000000 + 0x18),	0x1913,
+		(0x01100000 + 0x18),	0x1913,
+		(0x01200000 + 0x18),	0x1913,
+		(0x01300000 + 0x18),	0x1913,
+		(0x60000040 + 0x18),	0x1953,
+		(0x60000080 + 0x18),	0x1953,
+		(0x600000C0 + 0x18),	0x19B3,
+	};
+	uint32_t enable_addr_val [] = {
+		(0x02100000 + 0x40),	0x2,
+		(0x01000000 + 0x40),	0x6,
+		(0x01100000 + 0x40),	0x6,
+		(0x01200000 + 0x40),	0x6,
+		(0x01300000 + 0x40),	0x6,
+		(0x60000000 + 0x150),	0x0,
+	};
+	uint32_t reset_addr_val [] = {
+		(0x60000000 + 0x130),	0x0,
+		(0x60000000 + 0x134),	0x0,
+	};
+	
+	serial_print_str("clock init\n");
+
+	/* Get higher address based on Socket ID */
+	if (bc->socket_id == 0) {
+		addr_h = (uint32_t)0xFF;
+		uart_base = (void *)PLAT_UART0_BASE;
+	} else {
+		addr_h = (uint32_t)0x8FF;
+		uart_base = (void *)PLAT_UART0_BASE + PLAT_SOCKET_OFFSET;
+	}
+
+	/* No need to configure PLL over Zebu */
+	if (bc->work_mode == BC_WORK_MODE_VZEBU) {
+		goto skip_pll_config;
+	}
+
+	/* Write to each PLL to configure */
+	for (i = 0; i < sizeof(conf_addr_val)/sizeof(uint32_t); i += 2) {
+		addr = (void *)((((uint64_t)addr_h) << 32) | ((uint64_t)conf_addr_val[i]));
+		val = conf_addr_val[i + 1];
+		writel(val, addr);
+	}
+
+	/* Read each PLL to wait */
+	for (i = 0; i < sizeof(conf_addr_val)/sizeof(uint32_t); i += 2) {
+		addr = (void *)((((uint64_t)addr_h) << 32) | ((uint64_t)conf_addr_val[i]));
+		do {
+			val = readl(addr);
+		} while (val & 0x10000);
+	}
+
+skip_pll_config:
+	/* Release resets excluding PC cores */
+#if 0
+	for (i = 0; i < sizeof(reset_addr_val)/sizeof(uint32_t); i += 2) {
+		addr = (void *)((((uint64_t)addr_h) << 32) | ((uint64_t)reset_addr_val[i]));
+		val = readl(addr);
+		val += 1;
+	}
+#endif
+	for (i = 0; i < sizeof(reset_addr_val)/sizeof(uint32_t); i += 2) {
+		addr = (void *)((((uint64_t)addr_h) << 32) | ((uint64_t)reset_addr_val[i]));
+		val = reset_addr_val[i + 1];
+		writel(val, addr);
+	}
+
+	/* Switch to PLL clocks */
+	for (i = 0; i < sizeof(enable_addr_val)/sizeof(uint32_t); i += 2) {
+		addr = (void *)((((uint64_t)addr_h) << 32) | ((uint64_t)enable_addr_val[i]));
+		val = enable_addr_val[i + 1];
+		writel(val, addr);
+	}
+
+	/* Change clock parameter for devices */
+	dw_uart_init(uart_base, bc->uart_freq_div);
+
+	serial_print_str("clock ok\n");
+	return;
+}
+
 void plat_start_pc(void) { return; }
 void plat_setup_pg(void) { return; }
 void plat_setup_sz(void) { return; }
 void plat_ddrctrl_init(void) { return; }
 void plat_chiplink_init(void) { return; }
+#endif
 
