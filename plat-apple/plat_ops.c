@@ -303,7 +303,22 @@ void plat_start_pc(void)
 	return;
 }
 
-void plat_setup_pg(void) { return; }
+void plat_setup_pg(void)
+{
+	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
+	volatile void *addr;
+	uint32_t val;
+
+	val = bc->pg_codes[bc->socket_id];
+	serial_print_str("pg_code ");
+	serial_print_hex_u32(val);
+	serial_print_str("\n");
+	addr = (void *)PLAT_SYSCSR_PARTIAL_GOOD;
+	writel(val, addr);
+
+	return;
+}
+
 void plat_setup_sz(void) { return; }
 void plat_ddrctrl_init(void) { return; }
 void plat_chiplink_init(void) { return; }
