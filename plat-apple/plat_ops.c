@@ -262,7 +262,47 @@ skip_pll_config:
 	return;
 }
 
-void plat_start_pc(void) { return; }
+void plat_start_pc(void)
+{
+	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
+	volatile void *addr;
+	uint32_t val;
+	uint32_t addr_h;
+	int i;
+	uint32_t start_addr_val [] = {
+		(0x01000000 + 0x50),	0,
+		(0x01100000 + 0x50),	0,
+		(0x01200000 + 0x50),	0,
+		(0x01300000 + 0x50),	0,
+	};
+
+	/* Enable trace log over Zebu */
+	if (bc->work_mode == BC_WORK_MODE_VZEBU && bc->socket_id == 0) {
+		serial_print_str("pc trace log\n");
+		addr = (void *)ZEBU_REG_PC_LOG;
+		val = 1;
+		writel(val, addr);
+	}
+
+	serial_print_str("start pc\n");
+
+	/* Get higher address based on Socket ID */
+	if (bc->socket_id == 0) {
+		addr_h = (uint32_t)0xFF;
+	} else {
+		addr_h = (uint32_t)0x8FF;
+	}
+
+	/* Release resets to start PC */
+	for (i = 0; i < sizeof(start_addr_val)/sizeof(uint32_t); i += 2) {
+		addr = (void *)((((uint64_t)addr_h) << 32) | ((uint64_t)start_addr_val[i]));
+		val = start_addr_val[i + 1];
+		writel(val, addr);
+	}
+
+	return;
+}
+
 void plat_setup_pg(void) { return; }
 void plat_setup_sz(void) { return; }
 void plat_ddrctrl_init(void) { return; }
