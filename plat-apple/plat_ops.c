@@ -319,7 +319,32 @@ void plat_setup_pg(void)
 	return;
 }
 
-void plat_setup_sz(void) { return; }
+void plat_setup_sz(void)
+{
+	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
+	volatile void *addr;
+	uint32_t val;
+	uint32_t *sharezone = (uint32_t *)PLAT_DDR_SHAREZONE;
+
+	val = bc->pg_codes[bc->socket_id];
+	sharezone[0] = 0;
+	sharezone[1] = bc->socket_cnt;
+	sharezone[2 + bc->socket_id] = val;
+	serial_print_str("sz ");
+	serial_print_hex_u32(sharezone[0]);
+	serial_print_str(" ");
+	serial_print_hex_u32(sharezone[1]);
+	serial_print_str(" ");
+	serial_print_hex_u32(sharezone[2]);
+	serial_print_str(" ");
+	serial_print_hex_u32(sharezone[3]);
+	serial_print_str("\n");
+
+	__asm__ __volatile__("fence; fence.i;");
+
+	return;
+}
+
 void plat_ddrctrl_init(void) { return; }
 void plat_chiplink_init(void) { return; }
 #endif
