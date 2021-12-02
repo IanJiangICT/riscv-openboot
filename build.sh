@@ -1,6 +1,8 @@
 #!/bin/bash
 
 plat_name="null"
+plat_name="apple"
+plat_name="banana"
 plat_dir="./plat-$plat_name"
 build_dir="./build"
 src_dir="./src"
@@ -37,10 +39,17 @@ do
 done
 
 echo "Build bootconf"
+make -f Makefile.bc clean
 make -f Makefile.bc 
 
 echo "Build ZSBL"
+make -f Makefile.zsbl-mc clean
 make -f Makefile.zsbl-mc
+make -f Makefile.zsbl-pc clean
 make -f Makefile.zsbl-pc
+
+echo "Build FSBL"
+make -f Makefile.fsbl clean
+make -f Makefile.fsbl
 
 exit 0
