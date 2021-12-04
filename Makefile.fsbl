@@ -42,3 +42,4 @@ $(BUILD_DIR)/%.co : $(SRC_DIR)/%.c
 
 $(BUILD_DIR)/fsbl.elf : $(objs) $(ld)
 	$(LD) $(LDFLAGS) -T$(ld) -o $@ $(objs)
+	$(DUMP) -d $@ > $@-dump.S

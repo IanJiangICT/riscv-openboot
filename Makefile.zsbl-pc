@@ -38,3 +38,4 @@ $(BUILD_DIR)/%.co : $(SRC_DIR)/%.c
 
 $(BUILD_DIR)/zsbl_pc.elf : $(objs) $(ld_pc)
 	$(LD) $(LDFLAGS) -T$(ld_pc) -o $@ $(objs)
+	$(DUMP) -d $@ > $@-dump.S
