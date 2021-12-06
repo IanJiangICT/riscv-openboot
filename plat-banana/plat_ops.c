@@ -16,27 +16,11 @@ void plat_bc_fix(void)
 	if (val == 0x0) {
 		bc->boot_start = BC_STORAGE_ROM_ONCHIP;
 		bc->storage_bc = BC_STORAGE_FLASH_0;
-	} else if (val == 0x1) {
-		bc->boot_start = BC_STORAGE_ROM_ONCHIP;
-		bc->storage_bc = BC_STORAGE_SD_0;
-	} else if (val == 0x2) {
-		bc->boot_start = BC_STORAGE_ROM_ONCHIP;
-		bc->storage_bc = BC_STORAGE_ROM_OFFCHIP;
-	} else if (val == 0x3) {
-		bc->boot_start = BC_STORAGE_ROM_OFFCHIP;
-		bc->storage_bc = BC_STORAGE_FLASH_0;
-	} else if (val == 0x4) {
-		bc->boot_start = BC_STORAGE_ROM_OFFCHIP;
-		bc->storage_bc = BC_STORAGE_SD_0;
-	} else if (val == 0x5) {
-		bc->boot_start = BC_STORAGE_ROM_OFFCHIP;
-		bc->storage_bc = BC_STORAGE_ROM_OFFCHIP;
-	} else if (val == 0x5) {
+	} else { /* Debug mode for Simulation */
 		bc->boot_start = BC_STORAGE_ROM_ONCHIP;
 		bc->storage_bc = BC_STORAGE_ROM_ONCHIP;
-	} else {
-		bc->boot_start = BC_STORAGE_ROM_ONCHIP;
-		bc->storage_bc = BC_STORAGE_FLASH_0;
+		bc->storage_fsbl = 0; // FSBL in RAM already
+		bc->enable_console = 0;
 	}
 
 	/* Always 1 socket */
