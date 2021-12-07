@@ -17,6 +17,7 @@
 .globl plat_setup_sz;
 .globl plat_ddrctrl_init;
 .globl plat_chiplink_init;
+.globl plat_mc_fsbl_final;
 #else
 void plat_bc_fix(void);
 void plat_flash_init(void);
@@ -33,6 +34,7 @@ void plat_setup_pg(void);
 void plat_setup_sz(void);
 void plat_ddrctrl_init(void);
 void plat_chiplink_init(void);
+void plat_mc_fsbl_final(void);
 #endif
 
 #endif

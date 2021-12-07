@@ -109,5 +109,12 @@ void plat_setup_pg(void) { return; }
 void plat_setup_sz(void) { return; }
 void plat_ddrctrl_init(void) { return; }
 void plat_chiplink_init(void) { return; }
+
+extern void pc_start(void);
+void plat_mc_fsbl_final(void)
+{
+	/* MC acts as PC finally on this platform */
+	pc_start();
+}
 #endif
 

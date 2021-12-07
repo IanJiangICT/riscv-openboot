@@ -347,5 +347,11 @@ void plat_setup_sz(void)
 
 void plat_ddrctrl_init(void) { return; }
 void plat_chiplink_init(void) { return; }
+
+void plat_mc_fsbl_final(void)
+{
+	/* MC does nothing finally on this platform */
+	while(1) { asm("wfi"); }
+}
 #endif
 

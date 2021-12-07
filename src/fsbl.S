@@ -15,6 +15,8 @@
 .section .text.init;
 .align 6;
 .globl _start;
+.globl pc_start;
+.globl mc_start;
 
 /* 
  * Common entry 
@@ -159,6 +161,7 @@ mc_start:
 	call	plat_setup_pg
 	call	plat_ddrctrl_init
 	call	plat_start_pc
+	call	plat_mc_fsbl_final
 
 fsbl_idle:
 	wfi
