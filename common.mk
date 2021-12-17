@@ -28,4 +28,6 @@ CFLAGS += -Wall
 CFLAGS += -I $(INC_DIR)
 CFLAGS += -I $(SRC_DIR)
 
+#CFLAGS += -D WITH_PRINTF
+
 LDFLAGS = -nostdlib
