@@ -7,10 +7,10 @@
 void plat_bc_fix(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
-	volatile void *addr;
+	volatile unsigned char *addr;
 	uint32_t val;
 
-	addr = (void *)PLAT_SYSCSR_BOOT_MODE;
+	addr = (unsigned char *)PLAT_SYSCSR_BOOT_MODE;
 	val = readl(addr);
 	val &= 0x0000000F;
 	if (val == 0x0) {
@@ -27,7 +27,7 @@ void plat_bc_fix(void)
 		bc->storage_bc = BC_STORAGE_ROM_ONCHIP;
 	}
 
-	addr = (void *)PLAT_SYSCSR_SOCKET_ID;
+	addr = (unsigned char *)PLAT_SYSCSR_SOCKET_ID;
 	val = readl(addr);
 	bc->socket_id = (val >> 1) & 0x00000001;
 	if (val & 0x00000001) {
@@ -43,15 +43,15 @@ void plat_bc_fix(void)
 void plat_flash_init(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
-	volatile void *tlmm_base;
-	volatile void *ssi_base;
+	volatile unsigned char *tlmm_base;
+	volatile unsigned char *ssi_base;
 	uint32_t val;
 
 	/* Configure TLMM for SSI0 */
 	if (bc->socket_id == 0) {
-		tlmm_base = (void *)PLAT_TLMM_BASE;
+		tlmm_base = (unsigned char *)PLAT_TLMM_BASE;
 	} else {
-		tlmm_base = (void *)PLAT_TLMM_BASE + PLAT_SOCKET_OFFSET;
+		tlmm_base = (unsigned char *)PLAT_TLMM_BASE + PLAT_SOCKET_OFFSET;
 	}
 	val = 0x00000009;
 	writel(val, tlmm_base + 192);
@@ -62,9 +62,9 @@ void plat_flash_init(void)
 
 	/* Initiate SSI0 */
 	if (bc->socket_id == 0) {
-		ssi_base = (void *)PLAT_SSI0_BASE;
+		ssi_base = (unsigned char *)PLAT_SSI0_BASE;
 	} else {
-		ssi_base = (void *)PLAT_SSI0_BASE + PLAT_SOCKET_OFFSET;
+		ssi_base = (unsigned char *)PLAT_SSI0_BASE + PLAT_SOCKET_OFFSET;
 	}
 	dw_ssi_init(ssi_base);
 
@@ -74,12 +74,12 @@ void plat_flash_init(void)
 void plat_flash_read_byte(unsigned int offset, unsigned char *buf)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
-	volatile void *ssi_base;
+	volatile unsigned char *ssi_base;
 
 	if (bc->socket_id == 0) {
-		ssi_base = (void *)PLAT_SSI0_BASE;
+		ssi_base = (unsigned char *)PLAT_SSI0_BASE;
 	} else {
-		ssi_base = (void *)PLAT_SSI0_BASE + PLAT_SOCKET_OFFSET;
+		ssi_base = (unsigned char *)PLAT_SSI0_BASE + PLAT_SOCKET_OFFSET;
 	}
 	dw_ssi_read_byte(ssi_base, offset, buf);
 
@@ -89,13 +89,13 @@ void plat_flash_read_byte(unsigned int offset, unsigned char *buf)
 void plat_flash_read(unsigned int offset, unsigned char *buf, unsigned int size)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
-	volatile void *ssi_base;
+	volatile unsigned char *ssi_base;
 	uint32_t i;
 
 	if (bc->socket_id == 0) {
-		ssi_base = (void *)PLAT_SSI0_BASE;
+		ssi_base = (unsigned char *)PLAT_SSI0_BASE;
 	} else {
-		ssi_base = (void *)PLAT_SSI0_BASE + PLAT_SOCKET_OFFSET;
+		ssi_base = (unsigned char *)PLAT_SSI0_BASE + PLAT_SOCKET_OFFSET;
 	}
 	if (bc->flash_step_size == 0) {
 		for (i = 0; i < size; i++) {
@@ -123,15 +123,15 @@ void plat_sd_read(unsigned int offset, unsigned char *buf, unsigned int size) { 
 void plat_serial_init(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
-	volatile void *tlmm_base;
-	volatile void *uart_base;
+	volatile unsigned char *tlmm_base;
+	volatile unsigned char *uart_base;
 	uint32_t val;
 
 	/* Configure TLMM for UART0/1/2/3 */
 	if (bc->socket_id == 0) {
-		tlmm_base = (void *)PLAT_TLMM_BASE;
+		tlmm_base = (unsigned char *)PLAT_TLMM_BASE;
 	} else {
-		tlmm_base = (void *)PLAT_TLMM_BASE + PLAT_SOCKET_OFFSET;
+		tlmm_base = (unsigned char *)PLAT_TLMM_BASE + PLAT_SOCKET_OFFSET;
 	}
 	val = 0x00000009;
 	writel(val, tlmm_base + 216);
@@ -145,9 +145,9 @@ void plat_serial_init(void)
 
 	/* Initiate UART0 */
 	if (bc->socket_id == 0) {
-		uart_base = (void *)PLAT_UART0_BASE;
+		uart_base = (unsigned char *)PLAT_UART0_BASE;
 	} else {
-		uart_base = (void *)PLAT_UART0_BASE + PLAT_SOCKET_OFFSET;
+		uart_base = (unsigned char *)PLAT_UART0_BASE + PLAT_SOCKET_OFFSET;
 	}
 	dw_uart_init(uart_base, bc->uart_freq_div0);
 
@@ -157,12 +157,12 @@ void plat_serial_init(void)
 void plat_serial_put_byte(unsigned char data)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
-	volatile void *uart_base;
+	volatile unsigned char *uart_base;
 
 	if (bc->socket_id == 0) {
-		uart_base = (void *)PLAT_UART0_BASE;
+		uart_base = (unsigned char *)PLAT_UART0_BASE;
 	} else {
-		uart_base = (void *)PLAT_UART0_BASE + PLAT_SOCKET_OFFSET;
+		uart_base = (unsigned char *)PLAT_UART0_BASE + PLAT_SOCKET_OFFSET;
 	}
 	dw_uart_put_byte(uart_base, data);
 
@@ -173,8 +173,8 @@ void plat_serial_put_byte(unsigned char data)
 void plat_clock_init(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
-	volatile void *addr;
-	volatile void *uart_base;
+	volatile unsigned char *addr;
+	volatile unsigned char *uart_base;
 	uint32_t val;
 	uint32_t addr_h;
 	int i;
@@ -207,10 +207,10 @@ void plat_clock_init(void)
 	/* Get higher address based on Socket ID */
 	if (bc->socket_id == 0) {
 		addr_h = (uint32_t)0xFF;
-		uart_base = (void *)PLAT_UART0_BASE;
+		uart_base = (unsigned char *)PLAT_UART0_BASE;
 	} else {
 		addr_h = (uint32_t)0x8FF;
-		uart_base = (void *)PLAT_UART0_BASE + PLAT_SOCKET_OFFSET;
+		uart_base = (unsigned char *)PLAT_UART0_BASE + PLAT_SOCKET_OFFSET;
 	}
 
 	/* No need to configure PLL over Zebu */
@@ -220,14 +220,14 @@ void plat_clock_init(void)
 
 	/* Write to each PLL to configure */
 	for (i = 0; i < sizeof(conf_addr_val)/sizeof(uint32_t); i += 2) {
-		addr = (void *)((((uint64_t)addr_h) << 32) | ((uint64_t)conf_addr_val[i]));
+		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)conf_addr_val[i]));
 		val = conf_addr_val[i + 1];
 		writel(val, addr);
 	}
 
 	/* Read each PLL to wait */
 	for (i = 0; i < sizeof(conf_addr_val)/sizeof(uint32_t); i += 2) {
-		addr = (void *)((((uint64_t)addr_h) << 32) | ((uint64_t)conf_addr_val[i]));
+		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)conf_addr_val[i]));
 		do {
 			val = readl(addr);
 		} while (val & 0x10000);
@@ -237,20 +237,20 @@ skip_pll_config:
 	/* Release resets excluding PC cores */
 #if 0
 	for (i = 0; i < sizeof(reset_addr_val)/sizeof(uint32_t); i += 2) {
-		addr = (void *)((((uint64_t)addr_h) << 32) | ((uint64_t)reset_addr_val[i]));
+		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)reset_addr_val[i]));
 		val = readl(addr);
 		val += 1;
 	}
 #endif
 	for (i = 0; i < sizeof(reset_addr_val)/sizeof(uint32_t); i += 2) {
-		addr = (void *)((((uint64_t)addr_h) << 32) | ((uint64_t)reset_addr_val[i]));
+		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)reset_addr_val[i]));
 		val = reset_addr_val[i + 1];
 		writel(val, addr);
 	}
 
 	/* Switch to PLL clocks */
 	for (i = 0; i < sizeof(enable_addr_val)/sizeof(uint32_t); i += 2) {
-		addr = (void *)((((uint64_t)addr_h) << 32) | ((uint64_t)enable_addr_val[i]));
+		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)enable_addr_val[i]));
 		val = enable_addr_val[i + 1];
 		writel(val, addr);
 	}
@@ -265,7 +265,7 @@ skip_pll_config:
 void plat_start_pc(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
-	volatile void *addr;
+	volatile unsigned char *addr;
 	uint32_t val;
 	uint32_t addr_h;
 	int i;
@@ -279,7 +279,7 @@ void plat_start_pc(void)
 	/* Enable trace log over Zebu */
 	if (bc->work_mode == BC_WORK_MODE_VZEBU && bc->socket_id == 0) {
 		serial_print_str("pc trace log\n");
-		addr = (void *)ZEBU_REG_PC_LOG;
+		addr = (unsigned char *)ZEBU_REG_PC_LOG;
 		val = 1;
 		writel(val, addr);
 	}
@@ -295,7 +295,7 @@ void plat_start_pc(void)
 
 	/* Release resets to start PC */
 	for (i = 0; i < sizeof(start_addr_val)/sizeof(uint32_t); i += 2) {
-		addr = (void *)((((uint64_t)addr_h) << 32) | ((uint64_t)start_addr_val[i]));
+		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)start_addr_val[i]));
 		val = start_addr_val[i + 1];
 		writel(val, addr);
 	}
@@ -306,14 +306,14 @@ void plat_start_pc(void)
 void plat_setup_pg(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
-	volatile void *addr;
+	volatile unsigned char *addr;
 	uint32_t val;
 
 	val = bc->pg_codes[bc->socket_id];
 	serial_print_str("pg_code ");
 	serial_print_hex_u32(val);
 	serial_print_str("\n");
-	addr = (void *)PLAT_SYSCSR_PARTIAL_GOOD;
+	addr = (unsigned char *)PLAT_SYSCSR_PARTIAL_GOOD;
 	writel(val, addr);
 
 	return;
@@ -322,7 +322,6 @@ void plat_setup_pg(void)
 void plat_setup_sz(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
-	volatile void *addr;
 	uint32_t val;
 	uint32_t *sharezone = (uint32_t *)PLAT_DDR_SHAREZONE;
 

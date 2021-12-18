@@ -1,7 +1,7 @@
 #include "simple_types.h"
 #include "riscv_mmio.h"
 
-void dw_uart_init(volatile void *uart_base, unsigned int baud)
+void dw_uart_init(volatile unsigned char *uart_base, unsigned int baud)
 {
 	uint32_t val;
 	val = 0x00000000; writel(val, uart_base + 0x10);	// MCR
@@ -14,7 +14,7 @@ void dw_uart_init(volatile void *uart_base, unsigned int baud)
 	return;
 }
 
-void dw_uart_put_byte(volatile void *uart_base, unsigned char data)
+void dw_uart_put_byte(volatile unsigned char *uart_base, unsigned char data)
 {
 	uint32_t val;
 	do { val = readl(uart_base + 0x7C); val &= 0x1; } while ((val & 0x1) != 0);

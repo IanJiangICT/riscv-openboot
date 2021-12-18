@@ -1,7 +1,7 @@
 #include "simple_types.h"
 #include "riscv_mmio.h"
 
-void dw_ssi_init(volatile void *ssi_base)
+void dw_ssi_init(volatile unsigned char *ssi_base)
 {
 	uint32_t val;
 	val = 0x00000000; writel(val, ssi_base + 0x08);	// Disable SSI
@@ -14,7 +14,7 @@ void dw_ssi_init(volatile void *ssi_base)
 }
 
 
-void dw_ssi_read_byte(volatile void *ssi_base, unsigned int offset, unsigned char *buf)
+void dw_ssi_read_byte(volatile unsigned char *ssi_base, unsigned int offset, unsigned char *buf)
 {
 	uint32_t val;
 	val = 0x00000000; writel(val, ssi_base + 0x08);	// Disable SSI

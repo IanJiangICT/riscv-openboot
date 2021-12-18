@@ -7,10 +7,10 @@
 void plat_bc_fix(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
-	volatile void *addr;
+	volatile unsigned char *addr;
 	uint32_t val;
 
-	addr = (void *)PLAT_SYSCSR_BOOT_MODE;
+	addr = (unsigned char *)PLAT_SYSCSR_BOOT_MODE;
 	val = readl(addr);
 	val &= 0x0000000F;
 	if (val == 0x0) {
@@ -32,9 +32,9 @@ void plat_bc_fix(void)
 #include "dw_ssi.h"
 void plat_flash_init(void)
 {
-	volatile void *ssi_base;
+	volatile unsigned char *ssi_base;
 
-	ssi_base = (void *)PLAT_SSI0_BASE;
+	ssi_base = (unsigned char *)PLAT_SSI0_BASE;
 	dw_ssi_init(ssi_base);
 
 	return;
@@ -42,9 +42,9 @@ void plat_flash_init(void)
 
 void plat_flash_read_byte(unsigned int offset, unsigned char *buf)
 {
-	volatile void *ssi_base;
+	volatile unsigned char *ssi_base;
 
-	ssi_base = (void *)PLAT_SSI0_BASE;
+	ssi_base = (unsigned char *)PLAT_SSI0_BASE;
 	dw_ssi_read_byte(ssi_base, offset, buf);
 
 	return;
@@ -53,10 +53,10 @@ void plat_flash_read_byte(unsigned int offset, unsigned char *buf)
 void plat_flash_read(unsigned int offset, unsigned char *buf, unsigned int size)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
-	volatile void *ssi_base;
+	volatile unsigned char *ssi_base;
 	uint32_t i;
 
-	ssi_base = (void *)PLAT_SSI0_BASE;
+	ssi_base = (unsigned char *)PLAT_SSI0_BASE;
 	if (bc->flash_step_size == 0) {
 		for (i = 0; i < size; i++) {
 			dw_ssi_read_byte(ssi_base, offset + i, buf + i);
@@ -83,10 +83,10 @@ void plat_sd_read(unsigned int offset, unsigned char *buf, unsigned int size) { 
 void plat_serial_init(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
-	volatile void *uart_base;
+	volatile unsigned char *uart_base;
 
 	/* Initiate UART0 */
-	uart_base = (void *)PLAT_UART0_BASE;
+	uart_base = (unsigned char *)PLAT_UART0_BASE;
 	dw_uart_init(uart_base, bc->uart_freq_div0);
 
 	return;
@@ -94,9 +94,9 @@ void plat_serial_init(void)
 
 void plat_serial_put_byte(unsigned char data)
 {
-	volatile void *uart_base;
+	volatile unsigned char *uart_base;
 
-	uart_base = (void *)PLAT_UART0_BASE;
+	uart_base = (unsigned char *)PLAT_UART0_BASE;
 	dw_uart_put_byte(uart_base, data);
 
 	return;
