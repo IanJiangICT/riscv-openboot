@@ -30,7 +30,7 @@ void serial_print_bin_u32(uint32_t v)
 	return;
 }
 
-static __attribute__((always_inline)) void print_hex_u8bits4(uint8_t v)
+static __attribute__((always_inline)) inline void print_hex_u8bits4(uint8_t v)
 {
 	uint8_t bits4 = v & 0x0F;
 	uint8_t c;
