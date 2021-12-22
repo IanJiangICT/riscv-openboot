@@ -8,6 +8,10 @@ void serial_init(void)
 	return;
 }
 
+#ifndef WITH_PRINTF
+
+void serial_printf(const char *format, ...) { return; }
+
 void serial_print_str(char *str)
 {
 	while (*str != '\0') {
@@ -48,10 +52,6 @@ void serial_print_hex_u32(uint32_t v)
 	}
 	return;
 }
-
-#ifndef WITH_PRINTF
-
-void serial_printf(const char *format, ...) { return; }
 
 #else
 
@@ -346,4 +346,10 @@ int serial_printf(const char *format, ...)
 
 	return retval;
 }
+
+void serial_print_str(char *str) { return serial_printf(str); }
+void serial_print_hex_u32(uint32_t v) { return serial_printf("%08x", (unsigned long)v); }
+/* Binary is not supported by printf, so use Hex instead.  */
+void serial_print_bin_u32(uint32_t v) { return serial_printf("%08x", (unsigned long)v); }
+
 #endif
