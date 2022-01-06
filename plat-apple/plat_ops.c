@@ -178,7 +178,7 @@ void plat_clock_init(void)
 	uint32_t val;
 	uint32_t addr_h;
 	int i;
-	uint32_t conf_addr_val [] = {
+	static uint32_t conf_addr_val [] = {
 		(0x60000000 + 0x18),	0x1943,
 		(0x02100000 + 0x18),	0x1923,
 		(0x01000000 + 0x18),	0x1913,
@@ -189,7 +189,7 @@ void plat_clock_init(void)
 		(0x60000080 + 0x18),	0x1953,
 		(0x600000C0 + 0x18),	0x19B3,
 	};
-	uint32_t enable_addr_val [] = {
+	static uint32_t enable_addr_val [] = {
 		(0x02100000 + 0x40),	0x2,
 		(0x01000000 + 0x40),	0x6,
 		(0x01100000 + 0x40),	0x6,
@@ -197,7 +197,7 @@ void plat_clock_init(void)
 		(0x01300000 + 0x40),	0x6,
 		(0x60000000 + 0x150),	0x0,
 	};
-	uint32_t reset_addr_val [] = {
+	static uint32_t reset_addr_val [] = {
 		(0x60000000 + 0x130),	0x0,
 		(0x60000000 + 0x134),	0x0,
 	};
@@ -269,7 +269,7 @@ void plat_start_pc(void)
 	uint32_t val;
 	uint32_t addr_h;
 	int i;
-	uint32_t start_addr_val [] = {
+	static uint32_t start_addr_val [] = {
 		(0x01000000 + 0x50),	0,
 		(0x01100000 + 0x50),	0,
 		(0x01200000 + 0x50),	0,
