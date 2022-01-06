@@ -103,7 +103,120 @@ void plat_serial_put_byte(unsigned char data)
 }
 
 #ifdef FSBL_FUNC
-void plat_clock_init(void) { return; }
+
+#define PLAT_CLK_BASE 0x4302000
+#define CLK_CONFIG_BASE (PLAT_CLK_BASE + 0x100)
+#define CLK_ENABLE_BASE (PLAT_CLK_BASE + 0x400)
+
+void plat_clock_init(void)
+{
+	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
+	volatile unsigned char *addr;
+	volatile unsigned char *uart_base;
+	uint32_t val;
+	uint32_t addr_h;
+	int i;
+	static uint32_t conf_addr_val [] = {
+		(CLK_CONFIG_BASE + 0x40 * 0 + 0x20), 0xF4240,
+		(CLK_CONFIG_BASE + 0x40 * 1 + 0x20), 0x124F80,
+		(CLK_CONFIG_BASE + 0x40 * 2 + 0x20), 0x124F80,
+		(CLK_CONFIG_BASE + 0x40 * 3 + 0x20), 0xC3500,
+		(CLK_CONFIG_BASE + 0x40 * 4 + 0x20), 0xC3500,
+		(CLK_CONFIG_BASE + 0x40 * 5 + 0x20), 0xF4240,
+		(CLK_CONFIG_BASE + 0x40 * 6 + 0x20), 0x10C8E0,
+		(CLK_CONFIG_BASE + 0x40 * 7 + 0x20), 0x2625A,
+		(CLK_CONFIG_BASE + 0x40 * 8 + 0x20), 0x2625A,
+
+		(CLK_CONFIG_BASE + 0x40 * 0 + 0x24), 0x0,
+		(CLK_CONFIG_BASE + 0x40 * 1 + 0x24), 0x0,
+		(CLK_CONFIG_BASE + 0x40 * 2 + 0x24), 0x0,
+		(CLK_CONFIG_BASE + 0x40 * 3 + 0x24), 0x0,
+		(CLK_CONFIG_BASE + 0x40 * 4 + 0x24), 0x186A0,
+		(CLK_CONFIG_BASE + 0x40 * 5 + 0x24), 0x0,
+		(CLK_CONFIG_BASE + 0x40 * 6 + 0x24), 0x0,
+		(CLK_CONFIG_BASE + 0x40 * 7 + 0x24), 0x0,
+		(CLK_CONFIG_BASE + 0x40 * 8 + 0x24), 0x0,
+
+		(CLK_CONFIG_BASE + 0x40 * 0 + 0x1C), 25000,
+		(CLK_CONFIG_BASE + 0x40 * 1 + 0x1C), 25000,
+		(CLK_CONFIG_BASE + 0x40 * 2 + 0x1C), 25000,
+		(CLK_CONFIG_BASE + 0x40 * 3 + 0x1C), 25000,
+		(CLK_CONFIG_BASE + 0x40 * 4 + 0x1C), 25000,
+		(CLK_CONFIG_BASE + 0x40 * 5 + 0x1C), 25000,
+		(CLK_CONFIG_BASE + 0x40 * 6 + 0x1C), 25000,
+		(CLK_CONFIG_BASE + 0x40 * 7 + 0x1C), 25000,
+		(CLK_CONFIG_BASE + 0x40 * 8 + 0x1C), 25000,
+
+		(CLK_CONFIG_BASE + 0x40 * 0 + 0x18), 0x2,
+		(CLK_CONFIG_BASE + 0x40 * 1 + 0x18), 0x2,
+		(CLK_CONFIG_BASE + 0x40 * 2 + 0x18), 0x2,
+		(CLK_CONFIG_BASE + 0x40 * 3 + 0x18), 0x2,
+		(CLK_CONFIG_BASE + 0x40 * 4 + 0x18), 0x2,
+		(CLK_CONFIG_BASE + 0x40 * 5 + 0x18), 0x2,
+		(CLK_CONFIG_BASE + 0x40 * 6 + 0x18), 0x2,
+		(CLK_CONFIG_BASE + 0x40 * 7 + 0x18), 0x2,
+		(CLK_CONFIG_BASE + 0x40 * 8 + 0x18), 0x2,
+	};
+	static uint32_t check_addr [] = {
+		(CLK_CONFIG_BASE + 0x40 * 0 + 0x18),
+		(CLK_CONFIG_BASE + 0x40 * 1 + 0x18),
+		(CLK_CONFIG_BASE + 0x40 * 2 + 0x18),
+		(CLK_CONFIG_BASE + 0x40 * 3 + 0x18),
+		(CLK_CONFIG_BASE + 0x40 * 4 + 0x18),
+		(CLK_CONFIG_BASE + 0x40 * 5 + 0x18),
+		(CLK_CONFIG_BASE + 0x40 * 6 + 0x18),
+		(CLK_CONFIG_BASE + 0x40 * 7 + 0x18),
+		(CLK_CONFIG_BASE + 0x40 * 8 + 0x18),
+	};
+	static uint32_t enable_addr_val [] = {
+		(CLK_ENABLE_BASE + 0x4 * 0), 0x0,
+		(CLK_ENABLE_BASE + 0x4 * 1), 0x4,
+		(CLK_ENABLE_BASE + 0x4 * 2), 0x6,
+		(CLK_ENABLE_BASE + 0x4 * 3), 0x0,
+		(CLK_ENABLE_BASE + 0x4 * 4), 0xC,
+		(CLK_ENABLE_BASE + 0x4 * 5), 0xC,
+	};
+
+	serial_print_str("clock init\n");
+
+	addr_h = 0;
+	uart_base = (unsigned char *)PLAT_UART0_BASE;
+
+	/* No need to configure PLL over Zebu */
+	if (bc->work_mode == BC_WORK_MODE_VZEBU) {
+		goto skip_pll_config;
+	}
+
+	/* Write to each PLL to configure */
+	for (i = 0; i < sizeof(conf_addr_val)/sizeof(uint32_t); i += 2) {
+		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)conf_addr_val[i]));
+		val = conf_addr_val[i + 1];
+		writel(val, addr);
+	}
+
+	/* Read each PLL to wait */
+	for (i = 0; i < sizeof(check_addr)/sizeof(uint32_t); i++) {
+		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)check_addr[i]));
+		do {
+			val = readl(addr);
+		} while (val & 0x10000);
+	}
+
+skip_pll_config:
+	/* Switch to PLL clocks */
+	for (i = 0; i < sizeof(enable_addr_val)/sizeof(uint32_t); i += 2) {
+		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)enable_addr_val[i]));
+		val = enable_addr_val[i + 1];
+		writel(val, addr);
+	}
+
+	/* Change clock parameter for devices */
+	dw_uart_init(uart_base, bc->uart_freq_div);
+
+	serial_print_str("clock ok\n");
+	return;
+}
+
 void plat_start_pc(void) { return; }
 void plat_setup_pg(void) { return; }
 void plat_setup_sz(void) { return; }
