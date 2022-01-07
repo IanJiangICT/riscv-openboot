@@ -170,6 +170,9 @@ void plat_serial_put_byte(unsigned char data)
 }
 
 #ifdef FSBL_FUNC
+
+void plat_power_init(void) { return; }
+
 void plat_clock_init(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;

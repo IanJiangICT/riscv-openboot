@@ -104,6 +104,8 @@ void plat_serial_put_byte(unsigned char data)
 
 #ifdef FSBL_FUNC
 
+void plat_power_init(void) { return; }
+
 #define PLAT_CLK_BASE 0x4302000
 #define CLK_CONFIG_BASE (PLAT_CLK_BASE + 0x100)
 #define CLK_ENABLE_BASE (PLAT_CLK_BASE + 0x400)

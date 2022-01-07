@@ -157,6 +157,7 @@ fsbl_error:
  */
 mc_start:
 	call	fsbl_first_print
+	call	plat_power_init
 	call	plat_clock_init
 	call	plat_setup_pg
 	call	plat_ddrctrl_init

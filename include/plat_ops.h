@@ -11,6 +11,7 @@
 .globl plat_sd_read;
 .globl plat_serial_init;
 .globl plat_serial_put_byte;
+.globl plat_power_init;
 .globl plat_clock_init;
 .globl plat_start_pc;
 .globl plat_setup_pg;
@@ -28,6 +29,7 @@ void plat_sd_read_byte(unsigned int offset, unsigned char *buf);
 void plat_sd_read(unsigned int offset, unsigned char *buf, unsigned int size);
 void plat_serial_init(void);
 void plat_serial_put_byte(unsigned char data);
+void plat_power_init(void);
 void plat_clock_init(void);
 void plat_start_pc(void);
 void plat_setup_pg(void);
