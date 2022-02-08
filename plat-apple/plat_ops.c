@@ -159,6 +159,8 @@ void plat_serial_put_byte(unsigned char data)
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
 	volatile unsigned char *uart_base;
 
+	if (bc->enable_console == 0) return;
+
 	if (bc->socket_id == 0) {
 		uart_base = (unsigned char *)PLAT_UART0_BASE;
 	} else {
