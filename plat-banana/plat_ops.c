@@ -94,7 +94,10 @@ void plat_serial_init(void)
 
 void plat_serial_put_byte(unsigned char data)
 {
+	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
 	volatile unsigned char *uart_base;
+
+	if (bc->enable_console == 0) return;
 
 	uart_base = (unsigned char *)PLAT_UART0_BASE;
 	dw_uart_put_byte(uart_base, data);
