@@ -97,7 +97,7 @@ void plat_flash_read(unsigned int offset, unsigned char *buf, unsigned int size)
 	} else {
 		ssi_base = (unsigned char *)PLAT_SSI0_BASE + PLAT_SOCKET_OFFSET;
 	}
-	if (bc->flash_step_size == 0) {
+	if (bc->flash_step_size <= 1) {
 		for (i = 0; i < size; i++) {
 			dw_ssi_read_byte(ssi_base, offset + i, buf + i);
 		}
