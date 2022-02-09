@@ -2,6 +2,7 @@
 #define BOOTCONF_H
 
 #define BOOTCONF_SIZE_MAX	0x1000
+#define BOOTCONF_SOCKET_MAX 8
 
 #ifndef __ASM__
 #include "simple_types.h"
@@ -48,7 +49,7 @@ struct bootconf {
                                  * controller and the device. In fact, this is always supported
                                  * by actual flash chips, but might not be supported by some 
                                  * verification models */
-	uint32_t pg_codes[0];		/* [Optional] Partial good codes for each socket. */
+	uint32_t pg_codes[BOOTCONF_SOCKET_MAX];		/* [Optional] Partial good codes for each socket. */
 } __attribute__ ((packed));
 
 #endif
