@@ -19,6 +19,7 @@ all: $(elfs)
 
 clean:
 	rm -rf $(ld_pc)
+	rm -rf $(ld_pc)-offchip
 	rm -rf $(a_objs)
 	rm -rf $(c_objs)
 	rm -rf $(elfs)
@@ -26,7 +27,8 @@ clean:
 objs: $(a_objs) $(c_objs)
 
 $(ld_pc): $(lds_pc)
-	$(CC) $(CFLAGS) -E -P - < $< -o $@
+	$(CC) $(CFLAGS) -D PLAT_ROM_ZSBL_PC=PLAT_ROM_BASE+PLAT_ROM_OFFSET_PC -E -P - < $< -o $@
+	$(CC) $(CFLAGS) -D PLAT_ROM_ZSBL_PC=PLAT_ROM_BASE_OFFCHIP+PLAT_ROM_OFFSET_PC -E -P - < $< -o $@-offchip
 
 $(BUILD_DIR)/%.ao : $(SRC_DIR)/%.S
 	mkdir -p $(dir $@)
@@ -38,4 +40,6 @@ $(BUILD_DIR)/%.co : $(SRC_DIR)/%.c
 
 $(BUILD_DIR)/zsbl_pc.elf : $(objs) $(ld_pc)
 	$(LD) $(LDFLAGS) -T$(ld_pc) -o $@ $(objs)
-	$(DUMP) -d $@ > $@-dump.S
+	$(LD) $(LDFLAGS) -T$(ld_pc)-offchip -o $@-offchip $(objs)
+	$(DUMP) -D $@ > $@-dump.S
+	$(DUMP) -D $@-offchip > $@-offchip-dump.S
