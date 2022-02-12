@@ -4,11 +4,11 @@
 #include "plat_ops.h"
 #include "plat_def.h"
 
-extern void *_start;
+extern struct bootconf *bootconf0;
 
 void zsbl_set_bc_rom(void)
 {
-	unsigned char *ptr_src = (unsigned char *)(&_start) + PLAT_ROM_OFFSET_BC0;
+	unsigned char *ptr_src = (unsigned char *)(&bootconf0);
 	unsigned char *ptr_dst = (unsigned char *)PLAT_RAM_BC;
 	uint32_t data_size;
 	int i;

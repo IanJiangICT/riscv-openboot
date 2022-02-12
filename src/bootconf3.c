@@ -15,8 +15,6 @@
 #define THIS_STORAGE_OPENSBI	BC_STORAGE_DDR
 #define THIS_BOOT_START			BC_STORAGE_ROM_ONCHIP
 
-unsigned char _start[0]; /* Defined to avoid link warning */
-
 struct bootconf __attribute__((section(".data")))bootconf0 = {
 	.conf_size		= sizeof(struct bootconf) - sizeof(uint32_t) * (BOOTCONF_SOCKET_MAX - SOCKET_CNT),
 	.boot_start		= THIS_BOOT_START,
