@@ -6,13 +6,16 @@ Bootloader for RISC-V processors.
 ```
                  <- low                                          high->
 
+ROM off-chip     |----------------------------------------------------|
+   PLAT_ROM_BASE_| Relocator + ZSBL-MC + BootConf0 + ZSBL-PC(optinal) |
+       OFFCHIP 
+    
                    Segment 0      1          2        ...      x
 ROM on-chip      |----------|----------|----------| ~ ~ ~ ~|----------|
-(or off-chip)     ZSBL-MC    BootConf0  SeltTest(optinal)   ZSBL-PC(optinal)
+                  ZSBL-MC + BootConf0    SeltTest(optinal)   ZSBL-PC(optinal)
                  ^          ^          ^                   ^
     PLAT_ROM_BASE|          |          |                   |PLAT_ROM_OFFSET_PC
                  |          |          |PLAT_ROM_OFFSET_ST
-                 |          |PLAT_ROM_OFFSET_BC0
                  |PLAT_ROM_OFFSET_MC
 
 
