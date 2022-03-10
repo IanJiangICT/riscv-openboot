@@ -3,7 +3,8 @@ SRC_DIR = $(TOP_DIR)/src
 BUILD_DIR = $(TOP_DIR)/build
 INC_DIR =  $(TOP_DIR)/include
 
-CONF_PRINTF_ON       = 1
+CONF_PRINT_ENABLE    = 0
+CONF_PRINTF_ON       = 0
 CONF_ZSBL_ONCHIP     = 1
 CONF_STORAGE_PROBE   = 1
 
@@ -35,8 +36,12 @@ CFLAGS += -Wall
 CFLAGS += -I $(INC_DIR)
 CFLAGS += -I $(SRC_DIR)
 
+ifeq ($(CONF_PRINT_ENABLE), 1)
+CFLAGS += -D PRINT_ENABLE
+endif
+
 ifeq ($(CONF_PRINTF_ON), 1)
-CFLAGS += -D WITH_PRINTF
+CFLAGS += -D PRINTF_ON
 endif
 
 ifeq ($(CONF_ZSBL_ONCHIP), 1)

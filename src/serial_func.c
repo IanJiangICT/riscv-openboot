@@ -8,7 +8,17 @@ void serial_init(void)
 	return;
 }
 
-#ifndef WITH_PRINTF
+#ifndef PRINT_ENABLE
+
+void serial_printf(const char *format, ...) { return; }
+void serial_print_str(char *str) { return; }
+void serial_print_bin_u32(uint32_t v) { return; }
+static __attribute__((always_inline)) inline void print_hex_u8bits4(uint8_t v) { return; }
+void serial_print_hex_u32(uint32_t v) { return; }
+
+#else
+
+#ifndef PRINTF_ON
 
 void serial_printf(const char *format, ...) { return; }
 
@@ -347,9 +357,11 @@ int serial_printf(const char *format, ...)
 	return retval;
 }
 
-void serial_print_str(char *str) { return serial_printf(str); }
-void serial_print_hex_u32(uint32_t v) { return serial_printf("%08x", (unsigned long)v); }
+void serial_print_str(char *str) { serial_printf(str); }
+void serial_print_hex_u32(uint32_t v) { serial_printf("%08x", (unsigned long)v); }
 /* Binary is not supported by printf, so use Hex instead.  */
-void serial_print_bin_u32(uint32_t v) { return serial_printf("%08x", (unsigned long)v); }
+void serial_print_bin_u32(uint32_t v) { serial_printf("%08x", (unsigned long)v); }
+
+#endif
 
 #endif
