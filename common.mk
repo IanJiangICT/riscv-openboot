@@ -3,6 +3,13 @@ SRC_DIR = $(TOP_DIR)/src
 BUILD_DIR = $(TOP_DIR)/build
 INC_DIR =  $(TOP_DIR)/include
 
+CONF_PRINTF_ON       = 1
+CONF_ZSBL_ONCHIP     = 1
+CONF_STORAGE_PROBE   = 1
+
+CONF_MC_ACTS_AS_PC   = 0
+CONF_PC_ACTS_AS_MC   = 0
+
 ifdef LLVM_PATH
 CC = $(LLVM_PATH)/clang
 LD = $(LLVM_PATH)/ld.lld
@@ -28,6 +35,24 @@ CFLAGS += -Wall
 CFLAGS += -I $(INC_DIR)
 CFLAGS += -I $(SRC_DIR)
 
-#CFLAGS += -D WITH_PRINTF
+ifeq ($(CONF_PRINTF_ON), 1)
+CFLAGS += -D WITH_PRINTF
+endif
+
+ifeq ($(CONF_ZSBL_ONCHIP), 1)
+CFLAGS += -D ZSBL_ONCHIP
+endif
+
+ifeq ($(CONF_STORAGE_PROBE), 1)
+CFLAGS += -D STORAGE_PROBE
+endif
+
+ifeq ($(CONF_MC_ACTS_AS_PC), 1)
+CFLAGS += -D MC_ACTS_AS_PC
+endif
+
+ifeq ($(CONF_PC_ACTS_AS_MC), 1)
+CFLAGS += -D PC_ACTS_AS_MC
+endif
 
 LDFLAGS = -nostdlib
