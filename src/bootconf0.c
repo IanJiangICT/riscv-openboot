@@ -29,11 +29,20 @@ struct bootconf bootconf0 = {
 	.enable_console	= 1,
 	.enable_ddrctrl	= 1,
 	.socket_cnt		= SOCKET_CNT,
+#ifdef ZSBL_ONCHIP
+	/* For on-chip ZSBL, bus frequency originates from external clock (25MHz for example)
+	 * in the 1st initiating of these devices. */
 	.uart_freq_div0	= 20,	// 76800 under 25MHz
-	.uart_freq_div	= 81,	// 76800 under 100MHz
 	.flash_freq_div0= 2,	// 12.5MHz under 25MHz
-	.flash_freq_div	= 2,	// 50MHz under 100MHz
-	.flash_step_size= 256,
+#else
+	/* For off-chip ZSBL, bus frequency is switched to PLL clock (100MHz for example)
+	 * before the 1st initiating of these devices. */
+	.uart_freq_div0	= 81,	// 76800 under 25MHz
+	.flash_freq_div0= 4,	// 25MHz under 100MHz
+#endif
+	.uart_freq_div	= 81,	// 76800 under 100MHz
+	.flash_freq_div	= 4,	// 25MHz under 100MHz
+	.flash_step_size= 1,
 	.pg_codes = {
 		0x00000000,
 	}
