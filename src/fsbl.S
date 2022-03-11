@@ -31,6 +31,16 @@ _start:
 	li		t1,	SOC_CORE_TYPE_MC
 	beq		t0,	t1,	mc_start
 
+#ifdef PC_ACTS_AS_MC
+pc_acts_as_mc:
+	/* Only one PC (with hartid = 0) per socket acts as MC */
+	/* No need to set up partial-good */
+	call	fsbl_first_print
+	call	plat_power_init
+	call	plat_clock_init
+	call	plat_ddrctrl_init
+#endif
+
 /* 
  * PC flow
  */
