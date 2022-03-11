@@ -84,10 +84,20 @@ void storage_init(void)
 	return;
 }
 
+#ifdef STORAGE_PROBE
 /*
  * Read GUID type of the 1st GPT partition.
  */
-void storage_probe(void)
+
+/* Identify with type Linux filesystem */
+static unsigned char gpt_type_guid[] = {
+	0xAF, 0x3D, 0xC6, 0x0F,
+	0x83, 0x84, 0x72, 0x47,
+	0x8E, 0x79, 0x3D, 0x69,
+	0xD8, 0x47, 0x7D, 0xE4
+};
+
+int storage_probe(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
 	uint32_t storage = bc->storage_online;
@@ -97,23 +107,34 @@ void storage_probe(void)
 	uint32_t storage_offset;
 	void (*storage_read)(unsigned int, unsigned char *, unsigned int);
 	int part_num = 0;
+	int i;
+	unsigned char *probe_buf = (unsigned char *)(&this_entry);
+#ifdef STORAGE_PROBE_QUICK
+	unsigned int probe_size = sizeof(gpt_type_guid) / 4;
+#else
+	unsigned int probe_size = sizeof(gpt_type_guid);
+#endif
 	
 	if ((storage & (BC_STORAGE_FLASH_0 | BC_STORAGE_FLASH_I)) != 0) {
 		storage_offset = 0;
 		storage_read = &plat_flash_read;
 	} else { // TODO Other storage type
-		return;
+		return 1;
 	}
 
 	entry_size = sizeof(this_entry.type);
 	entry_offset = GPT_SECTOR_SIZE * GPT_PART_START_SECTOR;
 	entry_offset += entry_size * part_num;
-	storage_read((unsigned int)(storage_offset + entry_offset), (unsigned char *)(&this_entry), (unsigned int)entry_size);
+	storage_read((unsigned int)(storage_offset + entry_offset), probe_buf, probe_size);
 
-	/* Identify with type Linux filesystem, i.e. 16 bytes: AF 3D C6 0F 83 84 72 47 8E 79 3D 69 D8 47 7D E4  */
-	// TODO
-	return;
+	for (i = 0; i < probe_size; i++) {
+		if (probe_buf[i] != gpt_type_guid[i]) return -1;
+	}
+	return 0;
 }
+#else
+int storage_probe(void) { return 0; }
+#endif
 
 void storage_load_bc(void)
 {
