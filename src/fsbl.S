@@ -18,6 +18,10 @@
 .globl pc_start;
 .globl mc_start;
 
+#if defined(MC_ACTS_AS_PC) && defined(PC_ACTS_AS_MC)
+	#error "Invalid configuration. MC_ACTS_AS_PC and PC_ACTS_AS_MC are true at the same time."
+#endif
+
 /* 
  * Common entry 
 */
@@ -161,7 +165,12 @@ mc_start:
 	call	plat_clock_init
 	call	plat_setup_pg
 	call	plat_ddrctrl_init
+#ifdef MC_ACTS_AS_PC
+mc_acts_as_pc:
+	nop
+#else
 	call	plat_start_pc
+#endif
 	call	plat_mc_fsbl_final
 
 fsbl_idle:
