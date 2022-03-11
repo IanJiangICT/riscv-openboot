@@ -32,10 +32,11 @@ void plat_bc_fix(void)
 #include "dw_ssi.h"
 void plat_flash_init(void)
 {
+	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
 	volatile unsigned char *ssi_base;
 
 	ssi_base = (unsigned char *)PLAT_SSI0_BASE;
-	dw_ssi_init(ssi_base);
+	dw_ssi_init(ssi_base, bc->flash_freq_div0);
 
 	return;
 }
@@ -118,6 +119,7 @@ void plat_clock_init(void)
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
 	volatile unsigned char *addr;
 	volatile unsigned char *uart_base;
+	volatile unsigned char *ssi_base;
 	uint32_t val;
 	uint32_t addr_h;
 	int i;
@@ -186,6 +188,7 @@ void plat_clock_init(void)
 
 	addr_h = 0;
 	uart_base = (unsigned char *)PLAT_UART0_BASE;
+	ssi_base = (unsigned char *)PLAT_SSI0_BASE;
 
 	/* No need to configure PLL over Zebu */
 	if (bc->work_mode == BC_WORK_MODE_VZEBU) {
@@ -217,6 +220,7 @@ skip_pll_config:
 
 	/* Change clock parameter for devices */
 	dw_uart_init(uart_base, bc->uart_freq_div);
+	dw_ssi_init(ssi_base, bc->flash_freq_div);
 
 	serial_print_str("clock ok\n");
 	return;

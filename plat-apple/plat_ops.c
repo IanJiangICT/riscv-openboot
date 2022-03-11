@@ -66,7 +66,7 @@ void plat_flash_init(void)
 	} else {
 		ssi_base = (unsigned char *)PLAT_SSI0_BASE + PLAT_SOCKET_OFFSET;
 	}
-	dw_ssi_init(ssi_base);
+	dw_ssi_init(ssi_base, bc->flash_freq_div0);
 
 	return;
 }
@@ -180,6 +180,7 @@ void plat_clock_init(void)
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
 	volatile unsigned char *addr;
 	volatile unsigned char *uart_base;
+	volatile unsigned char *ssi_base;
 	uint32_t val;
 	uint32_t addr_h;
 	int i;
@@ -213,9 +214,11 @@ void plat_clock_init(void)
 	if (bc->socket_id == 0) {
 		addr_h = (uint32_t)0xFF;
 		uart_base = (unsigned char *)PLAT_UART0_BASE;
+		ssi_base = (unsigned char *)PLAT_SSI0_BASE;
 	} else {
 		addr_h = (uint32_t)0x8FF;
 		uart_base = (unsigned char *)PLAT_UART0_BASE + PLAT_SOCKET_OFFSET;
+		ssi_base = (unsigned char *)PLAT_SSI0_BASE + PLAT_SOCKET_OFFSET;
 	}
 
 	/* No need to configure PLL over Zebu */
@@ -262,6 +265,7 @@ skip_pll_config:
 
 	/* Change clock parameter for devices */
 	dw_uart_init(uart_base, bc->uart_freq_div);
+	dw_ssi_init(ssi_base, bc->flash_freq_div);
 
 	serial_print_str("clock ok\n");
 	return;

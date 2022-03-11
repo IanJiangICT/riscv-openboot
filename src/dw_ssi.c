@@ -1,13 +1,15 @@
 #include "simple_types.h"
 #include "riscv_mmio.h"
 
-void dw_ssi_init(volatile unsigned char *ssi_base)
+void dw_ssi_init(volatile unsigned char *ssi_base, unsigned int freq_div)
 {
 	uint32_t val;
 	val = 0x00000000; writel(val, ssi_base + 0x08);	// Disable SSI
 	val = 0x000703C0; writel(val, ssi_base + 0x00);	// CTRLR0: DFS_32 = 0x07 (8-bit), FRF = 0x0 (MOTOROLA_SPI)
 	val = 0x00000000; writel(val, ssi_base + 0x04);	// CTRLR1: NDF = 0 (only 1 byte)
-	val = 0x00000002; writel(val, ssi_base + 0x14);	// BAUDR
+	val = (uint32_t)freq_div;						// BAUDR: SCKDV is any even value between 2 and 65534
+	val = (val + 1) & 0x0000FFFE;
+					  writel(val, ssi_base + 0x14);
 	val = 0x00000000; writel(val, ssi_base + 0x2C);	// IMR: Mask all interrupts (do not allow any)
 	val = 0x00000001; writel(val, ssi_base + 0x08);	// Enable SSI
 	return;
