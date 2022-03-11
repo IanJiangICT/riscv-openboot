@@ -37,6 +37,41 @@ _stack_bottom_ok:
 
 call_funcs:
 	nop
+#ifdef PC_ACTS_AS_MC
+acts_as_mc:
+	/* TODO Support dual-socket */
+	/* Only one PC (with hartid = 0) per socket acts as MC */
+	li		t0, PLAT_RAM_SHARE_BASE
+	sw		zero, 0(t0)
+	csrr	t1, mhartid
+	andi	t1, t1, SOC_CORE_HARTID_MASK_SOCKET
+	bnez	t1, wait_funcs_end
+
+	call	zsbl_set_bc_rom
+	call	storage_init
+	call	storage_probe
+	call	storage_load_bc
+	call	zsbl_init_console
+	call	zsbl_print_bc
+	call	storage_load_fsbl
+
+	li		t0, PLAT_RAM_SHARE_BASE
+	li		t1, 1
+	sw		t1, 0(t0)
+	j		goto_fsbl
+
+wait_funcs_end:
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	lw		t1, 0(t0)
+	beqz	t1, wait_funcs_end
+#endif
 
 goto_fsbl:
 	li		t0,	PLAT_RAM_FSBL

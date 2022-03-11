@@ -8,8 +8,15 @@ ld_pc = $(BUILD_DIR)/zsbl_pc.ld
 lds_pc = $(SRC_DIR)/zsbl_pc.lds
 
 a_objs = $(elfs:elf=ao)
-#c_objs = $(BUILD_DIR)/zsbl_func.co
-#c_objs += $(BUILD_DIR)/plat_ops.co
+ifdef CONF_PC_ACTS_AS_MC
+c_objs = $(BUILD_DIR)/zsbl_func.co
+c_objs += $(BUILD_DIR)/bootconf0.co
+c_objs += $(BUILD_DIR)/storage_func.co
+c_objs += $(BUILD_DIR)/serial_func.co
+c_objs += $(BUILD_DIR)/plat_ops.co
+c_objs += $(BUILD_DIR)/dw_uart.co
+c_objs += $(BUILD_DIR)/dw_ssi.co
+endif
 
 objs = $(a_objs) $(c_objs)
 
