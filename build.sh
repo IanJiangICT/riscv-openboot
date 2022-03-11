@@ -6,6 +6,7 @@ plat_name="banana"
 plat_dir="./plat-$plat_name"
 build_dir="./build"
 src_dir="./src"
+bc_buildin="bootconf0.c"
 
 if [ $# -gt 0 ]
 then
@@ -20,6 +21,8 @@ else
 fi
 
 echo "Prepare"
+echo "    platform   : " $plat_name
+echo "    bc-buildin : " $bc_buildin
 if [ -d $build_dir ]
 then
 	rm -rf $build_dir
@@ -37,10 +40,11 @@ for f in `ls $plat_dir`
 do
 	ln -s ../$plat_dir/$f $src_dir/$f
 done
+ln -s ./$bc_buildin $src_dir/bc_buildin.c
 
 echo "Build bootconf"
 make -f Makefile.bc clean
-make -f Makefile.bc 
+make -f Makefile.bc
 
 echo "Build ZSBL"
 make -f Makefile.zsbl-mc clean

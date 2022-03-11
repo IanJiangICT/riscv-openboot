@@ -9,7 +9,7 @@ lds_mc = $(SRC_DIR)/zsbl_mc.lds
 
 a_objs = $(elfs:elf=ao)
 c_objs = $(BUILD_DIR)/zsbl_func.co
-c_objs += $(BUILD_DIR)/bootconf0.co
+c_objs += $(BUILD_DIR)/bc_buildin.co
 c_objs += $(BUILD_DIR)/storage_func.co
 c_objs += $(BUILD_DIR)/serial_func.co
 c_objs += $(BUILD_DIR)/plat_ops.co
