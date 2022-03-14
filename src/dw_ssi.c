@@ -1,5 +1,6 @@
 #include "simple_types.h"
 #include "riscv_mmio.h"
+#include "storage_def.h"
 
 void dw_ssi_init(volatile unsigned char *ssi_base, unsigned int freq_div)
 {
@@ -16,7 +17,7 @@ void dw_ssi_init(volatile unsigned char *ssi_base, unsigned int freq_div)
 }
 
 
-void dw_ssi_read_byte(volatile unsigned char *ssi_base, unsigned int offset, unsigned char *buf)
+void dw_ssi_read_byte(volatile unsigned char *ssi_base, unsigned int offset, unsigned char *buf, unsigned char addr_4bytes)
 {
 	uint32_t val;
 	val = 0x00000000; writel(val, ssi_base + 0x08);	// Disable SSI
@@ -25,8 +26,13 @@ void dw_ssi_read_byte(volatile unsigned char *ssi_base, unsigned int offset, uns
 	val = 0x00000000; writel(val, ssi_base + 0x10);	// SER: Disable slave
 	val = 0x00000001; writel(val, ssi_base + 0x08);	// Enable SSI
 
-	/* Send 1-byte Read CMD + 3-byte Address */
-	val = 0x03;                              writel(val, ssi_base + 0x60);
+	/* Send 1-byte Read CMD + 3/4 byte Address */
+	if (addr_4bytes) {
+		val = SPI_INST_READ_4BA;                 writel(val, ssi_base + 0x60);
+		val = (uint32_t)((offset >> 24) & 0xFF); writel(val, ssi_base + 0x60);
+	} else {
+		val = SPI_INST_READ;                     writel(val, ssi_base + 0x60);
+	}
 	val = (uint32_t)((offset >> 16) & 0xFF); writel(val, ssi_base + 0x60);
 	val = (uint32_t)((offset >>  8) & 0xFF); writel(val, ssi_base + 0x60);
 	val = (uint32_t)((offset      ) & 0xFF); writel(val, ssi_base + 0x60);
