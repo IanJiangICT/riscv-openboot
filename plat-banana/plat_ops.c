@@ -43,10 +43,12 @@ void plat_flash_init(void)
 
 void plat_flash_read_byte(unsigned int offset, unsigned char *buf)
 {
+	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
 	volatile unsigned char *ssi_base;
+	unsigned char flag = bc->flash_capability & BC_SPI_4BYTE_ADDR;
 
 	ssi_base = (unsigned char *)PLAT_SSI0_BASE;
-	dw_ssi_read_byte(ssi_base, offset, buf);
+	dw_ssi_read_byte(ssi_base, offset, buf, flag);
 
 	return;
 }
@@ -55,12 +57,13 @@ void plat_flash_read(unsigned int offset, unsigned char *buf, unsigned int size)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
 	volatile unsigned char *ssi_base;
+	unsigned char flag = bc->flash_capability & BC_SPI_4BYTE_ADDR;
 	uint32_t i;
 
 	ssi_base = (unsigned char *)PLAT_SSI0_BASE;
 	if (bc->flash_step_size <= 1) {
 		for (i = 0; i < size; i++) {
-			dw_ssi_read_byte(ssi_base, offset + i, buf + i);
+			dw_ssi_read_byte(ssi_base, offset + i, buf + i, flag);
 		}
 	} else { /* TODO: Optimize with continuously read */
 		uint32_t rx_size = 0;
@@ -69,7 +72,7 @@ void plat_flash_read(unsigned int offset, unsigned char *buf, unsigned int size)
 			rx_size += bc->flash_step_size;
 		}
 		for (i = 0; i < (size - rx_size); i++) {
-			dw_ssi_read_byte(ssi_base, offset + rx_size + i, buf + rx_size + i);
+			dw_ssi_read_byte(ssi_base, offset + rx_size + i, buf + rx_size + i, flag);
 		}
 	}
 
