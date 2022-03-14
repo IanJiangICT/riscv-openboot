@@ -32,6 +32,7 @@ struct bootconf bootconf1 = {
 	.uart_freq_div	= 1,	// 6250000 under 100MHz
 	.flash_freq_div0= 2,	// 12.5MHz under 25MHz
 	.flash_freq_div	= 2,	// 50MHz under 100MHz
+	.flash_capability = 0,
 	.flash_step_size= 1,	// Continuously transfer not supported by current flash device model
 	.pg_codes = {
 		0x01010118,		/* 1 hart enabled at socket 0 */

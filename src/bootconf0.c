@@ -42,6 +42,7 @@ struct bootconf bootconf0 = {
 #endif
 	.uart_freq_div	= 81,	// 76800 under 100MHz
 	.flash_freq_div	= 4,	// 25MHz under 100MHz
+	.flash_capability = 0,
 	.flash_step_size= 1,
 	.pg_codes = {
 		0x00000000,

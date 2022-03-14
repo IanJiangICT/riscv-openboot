@@ -27,6 +27,11 @@ enum bc_work_mode {
 	BC_WORK_MODE_VZEBU,		/* Verification with Zebu */
 };
 
+enum bc_spi {
+	BC_SPI_4BYTE_ADDR	= 0x0001,
+	BC_SPI_FAST_READ	= 0x0002,
+};
+
 struct bootconf {
 	uint32_t conf_size;			/* Size in byte, including struct bootconf + following data */
 	uint32_t boot_start;
@@ -44,6 +49,7 @@ struct bootconf {
 	uint32_t uart_freq_div; 	/* Frequncy dividor after clock works */
 	uint32_t flash_freq_div0;
 	uint32_t flash_freq_div;
+	uint32_t flash_capability;	/* Other fucntions supported beside reading 1 byte data with 3-byte address */
 	uint32_t flash_step_size;	/* Data size in byte of each read (or write) when continuously
                                  * transfer is supported, which depends on the capability of the 
                                  * controller and the device. In fact, this is always supported

@@ -30,6 +30,7 @@ struct bootconf __attribute__((section(".data")))bootconf0 = {
 	.uart_freq_div	= 81,	// 76800 under 100MHz
 	.flash_freq_div0= 2,	// 12.5MHz under 25MHz
 	.flash_freq_div	= 2,	// 50MHz under 100MHz
+	.flash_capability = BC_SPI_4BYTE_ADDR,
 	.flash_step_size= 256,
 	.pg_codes = {
 		0x00000000,
