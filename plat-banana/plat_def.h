@@ -54,6 +54,9 @@
 #define PLAT_CLINT0_BASE	 0x16800000
 #define	PLAT_PLIC0_BASE		 0x18000000
 
+#define PLAT_SSI_RXFIFO_DEPTH	4
+#define PLAT_SSI_TXFIFO_DEPTH	4
+
 #define CLINT_REG(offset)		(PLAT_CLINT0_BASE + (offset))
 #define CLINT_MSIP(hart)		CLINT_REG((hart) << 2)
 #define CLINT_MTIMECMP(hart)	CLINT_REG(0x4000 + ((hart) << 3))
