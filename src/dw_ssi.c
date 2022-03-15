@@ -20,6 +20,7 @@ void dw_ssi_jedec_id(volatile unsigned char *ssi_base, unsigned char *manufactur
 {
 	uint32_t val;
 	val = 0x00000000; writel(val, ssi_base + 0x08);	// Disable SSI
+	val = 0x000703C0; writel(val, ssi_base + 0x00);	// CTRLR0: DFS_32 = 0x07 (8-bit), FRF = 0x0 (MOTOROLA_SPI)
 	val = 0x00000002; writel(val, ssi_base + 0x04);	// CTRLR1: NDF = 2
 	val = 0x00000002; writel(val, ssi_base + 0x1C);	// RXFTLR: RFT = 2
 	val = 0x00000000; writel(val, ssi_base + 0x10);	// SER: Disable slave
@@ -47,6 +48,7 @@ void dw_ssi_read_byte(volatile unsigned char *ssi_base, unsigned int offset, uns
 {
 	uint32_t val;
 	val = 0x00000000; writel(val, ssi_base + 0x08);	// Disable SSI
+	val = 0x000703C0; writel(val, ssi_base + 0x00);	// CTRLR0: DFS_32 = 0x07 (8-bit), FRF = 0x0 (MOTOROLA_SPI)
 	val = 0x00000000; writel(val, ssi_base + 0x04);	// CTRLR1: NDF = 0 (only 1 byte)
 	val = 0x00000000; writel(val, ssi_base + 0x1C);	// RXFTLR: RFT = 0 (only 1 entry)
 	val = 0x00000000; writel(val, ssi_base + 0x10);	// SER: Disable slave
