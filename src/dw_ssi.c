@@ -16,6 +16,32 @@ void dw_ssi_init(volatile unsigned char *ssi_base, unsigned int freq_div)
 	return;
 }
 
+void dw_ssi_jedec_id(volatile unsigned char *ssi_base, unsigned char *manufacturer, unsigned char *mem_type, unsigned char *capacity)
+{
+	uint32_t val;
+	val = 0x00000000; writel(val, ssi_base + 0x08);	// Disable SSI
+	val = 0x00000002; writel(val, ssi_base + 0x04);	// CTRLR1: NDF = 2
+	val = 0x00000002; writel(val, ssi_base + 0x1C);	// RXFTLR: RFT = 2
+	val = 0x00000000; writel(val, ssi_base + 0x10);	// SER: Disable slave
+	val = 0x00000001; writel(val, ssi_base + 0x08);	// Enable SSI
+
+	/* Send 1-byte CMD */
+	val = SPI_INST_JEDEC_ID;                 writel(val, ssi_base + 0x60);
+	val = 0x00000001; writel(val, ssi_base + 0x10);	// Enable slave to start TX
+
+	/* Wait until RX FIFO is full: RISR.RXFIR = 1 */
+	do { val = readl(ssi_base + 0x34); } while ((val & 0x10) == 0);
+
+	/* Get data received */
+	val = readl(ssi_base + 0x60); *manufacturer = val & 0xFF;
+	val = readl(ssi_base + 0x60); *mem_type     = val & 0xFF;
+	val = readl(ssi_base + 0x60); *capacity     = val & 0xFF;
+
+	/* Disable slave */
+	val = 0x00000000; writel(val, ssi_base + 0x10);	// Disable slave
+
+	return;
+}
 
 void dw_ssi_read_byte(volatile unsigned char *ssi_base, unsigned int offset, unsigned char *buf, unsigned char addr_4bytes)
 {
