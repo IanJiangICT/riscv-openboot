@@ -1,6 +1,7 @@
 #include "simple_types.h"
 #include "riscv_mmio.h"
 #include "storage_def.h"
+#include "plat_def.h"
 
 void dw_ssi_init(volatile unsigned char *ssi_base, unsigned int freq_div)
 {
@@ -78,3 +79,46 @@ void dw_ssi_read_byte(volatile unsigned char *ssi_base, unsigned int offset, uns
 
 	return;
 }
+
+#ifdef FSBL_FUNC
+unsigned int dw_ssi_read_fast(volatile unsigned char *ssi_base, unsigned int offset, unsigned char *buf, unsigned int size)
+{
+	uint32_t val;
+	unsigned int halfword_cnt;
+	int i;
+
+	if (size > (PLAT_SSI_RXFIFO_DEPTH * 2)) {
+		halfword_cnt = PLAT_SSI_RXFIFO_DEPTH;
+	} else {
+		halfword_cnt = size >> 1;
+	}
+	val = 0x00000000; writel(val, ssi_base + 0x08);	// Disable SSI
+	val = 0x000F03C0; writel(val, ssi_base + 0x00);	// CTRLR0: DFS_32 = 0x0F (16-bit), FRF = 0x0 (MOTOROLA_SPI)
+	val = halfword_cnt; writel(val, ssi_base + 0x04);	// CTRLR1: NDF
+	val = halfword_cnt - 1; writel(val, ssi_base + 0x1C);	// RXFTLR: RFT
+	val = 0x00000000; writel(val, ssi_base + 0x10);	// SER: Disable slave
+	val = 0x00000001; writel(val, ssi_base + 0x08);	// Enable SSI
+
+	/* Send 3 halfwords: 1-byte Read CMD + 4 byte Address + 1 dummy byte */
+	val = (SPI_INST_FAST_READ_4BA << 8) | ((uint32_t)((offset >> 24) & 0x00FF));
+												writel(val, ssi_base + 0x60);
+	val = (uint32_t)((offset >> 8) & 0xFFFF);	writel(val, ssi_base + 0x60);
+	val = (uint32_t)((offset << 8) & 0xFF00);	writel(val, ssi_base + 0x60);
+	val = 0x00000001; writel(val, ssi_base + 0x10);	// Enable slave to start TX
+
+	/* Wait until RX FIFO is full: RISR.RXFIR = 1 */
+	do { val = readl(ssi_base + 0x34); } while ((val & 0x10) == 0);
+
+	/* Get data received */
+	for (i = 0; i < halfword_cnt; i++) {
+		val = readl(ssi_base + 0x60);
+		buf[i * 2] = (val >> 8) & 0xFF;
+		buf[i * 2 + 1] = val & 0xFF;
+	}
+
+	/* Disable slave */
+	val = 0x00000000; writel(val, ssi_base + 0x10);	// Disable slave
+
+	return (halfword_cnt << 1);
+}
+#endif
