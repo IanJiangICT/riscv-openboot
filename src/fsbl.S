@@ -170,6 +170,9 @@ fsbl_error:
  * MC flow
  */
 mc_start:
+#ifdef PC_ACTS_AS_MC
+	j		fsbl_idle
+#else
 	call	fsbl_first_print
 	call	plat_power_init
 	call	plat_clock_init
@@ -182,6 +185,7 @@ mc_acts_as_pc:
 	call	plat_start_pc
 #endif
 	call	plat_mc_fsbl_final
+#endif
 
 fsbl_idle:
 	wfi
