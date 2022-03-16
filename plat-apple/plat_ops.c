@@ -273,6 +273,27 @@ skip_pll_config:
 	return;
 }
 
+#if (!defined(PC_ACTS_AS_MC)) && (!defined(MC_ACTS_AS_PC))
+/* Match partial-good code into good-bit-mask (arry index) */
+static unsigned char pg_code_lut[] = {
+	0x01,
+	0x18,
+	0x14,
+	0x10,
+	0x42,
+	0x48,
+	0x44,
+	0x40,
+	0x22,
+	0x28,
+	0x24,
+	0x20,
+	0x02,
+	0x08,
+	0x04,
+	0x00
+};
+
 void plat_start_pc(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
@@ -286,6 +307,9 @@ void plat_start_pc(void)
 		(0x01200000 + 0x50),	0,
 		(0x01300000 + 0x50),	0,
 	};
+	int j;
+	uint32_t pg_code;
+	unsigned char good_bit_mask;
 
 	/* Enable trace log over Zebu */
 	if (bc->work_mode == BC_WORK_MODE_VZEBU && bc->socket_id == 0) {
@@ -305,6 +329,25 @@ void plat_start_pc(void)
 	}
 
 	/* Release resets to start PC */
+	/* - Compute register values */
+	for (i = 0; i < sizeof(start_addr_val)/sizeof(uint32_t); i += 2) {
+		pg_code = bc->pg_codes[bc->socket_id];
+		for (j = 0; j < i; j += 2) {
+			pg_code >>= 8;
+		}
+		for (j = 0; j < sizeof(pg_code_lut); j++) {
+			if (pg_code_lut[j] == (unsigned char)pg_code) {
+				break;
+			}
+		}
+		if (j > sizeof(pg_code_lut)) {
+			good_bit_mask = 0;
+		} else {
+			good_bit_mask = (unsigned char)j;
+		}
+		start_addr_val[i + 1] = ((uint32_t)((~good_bit_mask) & 0x0F)) << 4;
+	}
+	/* - Write registers */
 	for (i = 0; i < sizeof(start_addr_val)/sizeof(uint32_t); i += 2) {
 		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)start_addr_val[i]));
 		val = start_addr_val[i + 1];
@@ -313,6 +356,7 @@ void plat_start_pc(void)
 
 	return;
 }
+#endif
 
 void plat_setup_pg(void)
 {
