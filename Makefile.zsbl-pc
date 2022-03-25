@@ -39,11 +39,11 @@ $(ld_pc): $(lds_pc)
 
 $(BUILD_DIR)/%.ao : $(SRC_DIR)/%.S
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(MC_CONFIG) -D __ASM__ $< -o $@
+	$(CC) $(CFLAGS) $(PC_CONFIG) -D __ASM__ $< -o $@
 
 $(BUILD_DIR)/%.co : $(SRC_DIR)/%.c
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(MC_CONFIG) $< -o $@
+	$(CC) $(CFLAGS) $(PC_CONFIG) $< -o $@
 
 $(BUILD_DIR)/zsbl_pc.elf : $(objs) $(ld_pc)
 	$(LD) $(LDFLAGS) -T$(ld_pc) -o $@ $(objs)
