@@ -2,6 +2,10 @@ include common.mk
 
 CFLAGS+=-D FSBL_FUNC
 
+ifeq ($(CONF_FSBL_PRINT), 1)
+CFLAGS += -D PRINT_ENABLE
+endif
+
 elfs = $(BUILD_DIR)/fsbl.elf
 
 ld = $(BUILD_DIR)/fsbl.ld

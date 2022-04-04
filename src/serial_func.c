@@ -11,59 +11,17 @@ void serial_init(void)
 #ifndef PRINT_ENABLE
 
 void serial_printf(const char *format, ...) { return; }
+void serial_print_byte(char c) { return; }
 void serial_print_str(char *str) { return; }
-void serial_print_bin_u32(uint32_t v) { return; }
-static __attribute__((always_inline)) inline void print_hex_u8bits4(uint8_t v) { return; }
 void serial_print_hex_u32(uint32_t v) { return; }
 
 #else
 
-#ifndef PRINTF_ON
-
-void serial_printf(const char *format, ...) { return; }
-
-void serial_print_str(char *str)
+void serial_print_byte(char c)
 {
-	while (*str != '\0') {
-		plat_serial_put_byte((uint8_t)(*str));
-		str++;
-	}
+	plat_serial_put_byte((uint8_t)c);
 	return;
 }
-
-void serial_print_bin_u32(uint32_t v)
-{
-	uint8_t c;
-	uint32_t mask = 0x80000000;
-	do {
-		if (v & mask) c = '1';
-		else c = '0';
-		plat_serial_put_byte(c);
-		mask >>= 1;
-	} while (mask);
-	return;
-}
-
-static __attribute__((always_inline)) inline void print_hex_u8bits4(uint8_t v)
-{
-	uint8_t bits4 = v & 0x0F;
-	uint8_t c;
-	if (bits4 <= 9) c = bits4 + '0';
-	else c = bits4 = 10 + 'A';
-	plat_serial_put_byte(c);
-	return;
-}
-
-void serial_print_hex_u32(uint32_t v)
-{
-	unsigned int shift;
-	for (shift = 28 ; shift >= 0; shift -= 4) {
-		print_hex_u8bits4((uint8_t)(v >> shift));
-	}
-	return;
-}
-
-#else
 
 #include <stddef.h>
 #define u32 uint32_t
@@ -357,11 +315,15 @@ int serial_printf(const char *format, ...)
 	return retval;
 }
 
-void serial_print_str(char *str) { serial_printf(str); }
-void serial_print_hex_u32(uint32_t v) { serial_printf("%08x", (unsigned long)v); }
-/* Binary is not supported by printf, so use Hex instead.  */
-void serial_print_bin_u32(uint32_t v) { serial_printf("%08x", (unsigned long)v); }
+void serial_print_str(char *str)
+{
+	serial_printf(str);
+	return;
+}
 
-#endif
-
+void serial_print_hex_u32(uint32_t v)
+{
+	serial_printf("%08x", (unsigned long)v);
+	return;
+}
 #endif

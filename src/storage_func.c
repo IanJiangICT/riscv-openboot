@@ -24,34 +24,49 @@ static uint32_t gpt_load_part(int part_num, uint8_t *load_to, uint32_t storage)
 	uint32_t this_size;
 	uint32_t pad_size;
 	unsigned char *guid_bytes;
+#ifdef FSBL_FUNC
 	char print_str[] = "0 GPT...\n";
+#endif
 	uint32_t storage_offset;
 	void (*storage_read)(unsigned int, unsigned char *, unsigned int);
 	
+#ifdef FSBL_FUNC
 	serial_print_str("storage: ");
+#endif
 	if (storage == 0) {
+#ifdef FSBL_FUNC
 		serial_print_str(" null\n");
+#endif
 		return 0;
 	} else if (storage == BC_STORAGE_FLASH_0 || storage == BC_STORAGE_FLASH_I) {
 		storage_offset = 0;
 		storage_read = &plat_flash_read;
+#ifdef FSBL_FUNC
 		serial_print_str(" flash ");
+#endif
 	} else if (storage == BC_STORAGE_SD_0 || storage == BC_STORAGE_SD_I) {
 		storage_offset = 0;
 		storage_read = &plat_sd_read;
+#ifdef FSBL_FUNC
 		serial_print_str(" sd ");
+#endif
 	} else if (storage == BC_STORAGE_ROM_OFFCHIP) {
 		storage_offset = PLAT_ROM_SIZE;
 		storage_read = &rom_offchip_read;
+#ifdef FSBL_FUNC
 		serial_print_str(" rom offchip ");
+#endif
 	} else {
-		serial_print_hex_u32(storage);
+#ifdef FSBL_FUNC
 		serial_print_str(" not supported \n");
+#endif
 		return 0;
 	}
 
+#ifdef FSBL_FUNC
 	print_str[0] += part_num;
 	serial_print_str(print_str);
+#endif
 
 	entry_size = sizeof(this_entry);
 	entry_offset = GPT_SECTOR_SIZE * GPT_PART_START_SECTOR; // Base of entry table
@@ -74,11 +89,15 @@ void storage_init(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
 	if (bc->storage_online & (BC_STORAGE_FLASH_0 | BC_STORAGE_FLASH_I)) {
+#ifdef FSBL_FUNC
 		serial_print_str("storage flash\n");
+#endif
 		plat_flash_init();
 	}
 	if (bc->storage_online & (BC_STORAGE_SD_0 | BC_STORAGE_SD_I)) {
+#ifdef FSBL_FUNC
 		serial_print_str("storage sd\n");
+#endif
 		plat_sd_init();
 	}
 	return;

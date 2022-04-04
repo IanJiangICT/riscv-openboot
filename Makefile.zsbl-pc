@@ -2,6 +2,10 @@ include common.mk
 
 PC_CONFIG = -D CORE_TYPE_PC
 
+ifeq ($(CONF_ZSBL_PRINT), 1)
+CFLAGS += -D PRINT_ENABLE
+endif
+
 elfs = $(BUILD_DIR)/zsbl_pc.elf
 
 ld_pc = $(BUILD_DIR)/zsbl_pc.ld
