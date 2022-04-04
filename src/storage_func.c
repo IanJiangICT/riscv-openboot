@@ -164,7 +164,11 @@ void storage_load_bc(void)
 		return;
 	}
 
+#ifdef BC_AT_FLASH_PART0
+	plat_flash_read(GPT_PART_0_OFFSET, (unsigned char *)bc, sizeof(*bc));
+#else
 	gpt_load_part(GPT_PART_BOOTCONF, (uint8_t *)bc, bc->storage_bc);
+#endif
 	plat_bc_fix();
 	return;
 }

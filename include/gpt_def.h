@@ -115,4 +115,6 @@ struct gpt_header {
 
 #endif
 
+#define GPT_PART_0_OFFSET (GPT_SECTOR_SIZE * 2048)
+
 #endif
