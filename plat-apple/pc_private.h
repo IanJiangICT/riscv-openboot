@@ -5,4 +5,8 @@
 	csrr	t0,	marchid
 .endm
 
+.macro	PC_SET_NOC
+	nop
+.endm
+
 #endif

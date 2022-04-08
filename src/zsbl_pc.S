@@ -16,6 +16,8 @@ core_init:
 
 do_private:
 	PC_PRIVATE
+do_set_noc:
+	PC_SET_NOC
 
 zsbl_start:
 	nop
