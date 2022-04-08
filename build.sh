@@ -59,6 +59,9 @@ make -f Makefile.fsbl
 echo "Build binary and hex files"
 ./script/elf2hex-rom.sh $build_dir/zsbl_mc.elf
 ./script/elf2hex-rom.sh $build_dir/zsbl_pc.elf
+
 ./script/elf2hex-ram.sh $build_dir/fsbl.elf
+
+./script/elf2hex-ram.sh $build_dir/bc1-vcs.elf
 
 exit 0

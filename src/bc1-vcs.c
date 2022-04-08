@@ -10,12 +10,12 @@
 	BC_STORAGE_ROM_ONCHIP \
 	| BC_STORAGE_RAM_ONCHIP \
 	)
-#define THIS_STORAGE_BC 		BC_STORAGE_ROM_ONCHIP
+#define THIS_STORAGE_BC 		BC_STORAGE_FLASH_I
 #define THIS_STORAGE_FSBL 		BC_STORAGE_RAM_ONCHIP
 #define THIS_STORAGE_OPENSBI	BC_STORAGE_DDR
 #define THIS_BOOT_START			BC_STORAGE_ROM_ONCHIP
 
-struct bootconf __attribute__((section(".data")))bootconf0 = {
+struct bootconf bootconf1 = {
 	.conf_size		= sizeof(struct bootconf) - sizeof(uint32_t) * (BOOTCONF_SOCKET_MAX - SOCKET_CNT),
 	.boot_start		= THIS_BOOT_START,
 	.work_mode		= BC_WORK_MODE_VVCS,
@@ -23,15 +23,15 @@ struct bootconf __attribute__((section(".data")))bootconf0 = {
 	.storage_bc		= THIS_STORAGE_BC,
 	.storage_fsbl	= THIS_STORAGE_FSBL,
 	.storage_opensbi= THIS_STORAGE_OPENSBI,
-	.enable_console	= 1,
+	.enable_console	= 0,
 	.enable_ddrctrl	= 0,
 	.socket_cnt		= SOCKET_CNT,
-	.uart_freq_div0	= 20,	// 76800 under 25MHz
-	.uart_freq_div	= 81,	// 76800 under 100MHz
+	.uart_freq_div0	= 1,	// Max baud under 25MHz
 	.flash_freq_div0= 2,	// 12.5MHz under 25MHz
-	.flash_freq_div	= 2,	// 50MHz under 100MHz
+	.uart_freq_div	= 81,	// 76800 under 100MHz
+	.flash_freq_div	= 4,	// 25MHz under 100MHz
 	.flash_capability = BC_SPI_4BYTE_ADDR,
-	.flash_step_size= 256,
+	.flash_step_size= 1,
 	.pg_codes = {
 		0x00000000,
 	}
