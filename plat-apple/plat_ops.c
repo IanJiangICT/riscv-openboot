@@ -13,18 +13,26 @@ void plat_bc_fix(void)
 	addr = (unsigned char *)PLAT_SYSCSR_BOOT_MODE;
 	val = readl(addr);
 	val &= 0x0000000F;
-	if (val == 0x0) {
-		bc->boot_start = BC_STORAGE_ROM_ONCHIP;
-		bc->storage_bc = BC_STORAGE_SD_0;
-	} else if (val == 0x1) {
-		bc->boot_start = BC_STORAGE_ROM_ONCHIP;
-		bc->storage_bc = BC_STORAGE_FLASH_I;
-	} else if (val == 0x2) {
-		bc->boot_start = BC_STORAGE_ROM_OFFCHIP;
-		bc->storage_bc = BC_STORAGE_ROM_OFFCHIP;
-	} else {
+	if (val == PLAT_BOOTMODE_SIM_MC || val == PLAT_BOOTMODE_SIM_PC) {
 		bc->boot_start = BC_STORAGE_ROM_ONCHIP;
 		bc->storage_bc = BC_STORAGE_ROM_ONCHIP;
+		bc->storage_online = BC_STORAGE_ROM_ONCHIP;
+		bc->storage_online |= BC_STORAGE_RAM_ONCHIP;
+		bc->storage_online |= BC_STORAGE_FLASH_I;
+		bc->storage_fsbl = BC_STORAGE_RAM_ONCHIP;
+		bc->storage_opensbi = BC_STORAGE_DDR;
+		bc->flash_step_size = 1;
+		bc->enable_console = 0;
+	} else if (val == PLAT_BOOTMODE_SIM_MC_OFFCHIP || val == PLAT_BOOTMODE_SIM_PC_OFFCHIP) {
+		bc->boot_start = BC_STORAGE_ROM_OFFCHIP;
+		bc->storage_bc = BC_STORAGE_ROM_OFFCHIP;
+		bc->storage_online = BC_STORAGE_ROM_OFFCHIP;
+		bc->storage_online |= BC_STORAGE_RAM_ONCHIP;
+		bc->storage_online |= BC_STORAGE_FLASH_I;
+		bc->storage_fsbl = BC_STORAGE_RAM_ONCHIP;
+		bc->storage_opensbi = BC_STORAGE_DDR;
+		bc->flash_step_size = 1;
+		bc->enable_console = 0;
 	}
 
 	addr = (unsigned char *)PLAT_SYSCSR_SOCKET_ID;
