@@ -3,6 +3,7 @@
 plat_name="null"
 plat_name="apple"
 plat_name="banana"
+plat_name="grape"
 plat_dir="./plat-$plat_name"
 build_dir="./build"
 src_dir="./src"
