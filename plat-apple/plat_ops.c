@@ -16,13 +16,11 @@ void plat_bc_fix(void)
 	if (val == PLAT_BOOTMODE_SIM_MC || val == PLAT_BOOTMODE_SIM_PC) {
 		bc->boot_start = BC_STORAGE_ROM_ONCHIP;
 		bc->storage_bc = BC_STORAGE_ROM_ONCHIP;
-		bc->storage_online = BC_STORAGE_ROM_ONCHIP;
+		bc->storage_online |= BC_STORAGE_ROM_ONCHIP;
 		bc->storage_online |= BC_STORAGE_RAM_ONCHIP;
 		bc->storage_online |= BC_STORAGE_FLASH_I;
 		bc->storage_fsbl = BC_STORAGE_RAM_ONCHIP;
 		bc->storage_opensbi = BC_STORAGE_DDR;
-		bc->flash_step_size = 1;
-		bc->enable_console = 0;
 	} else if (val == PLAT_BOOTMODE_SIM_MC_OFFCHIP || val == PLAT_BOOTMODE_SIM_PC_OFFCHIP) {
 		bc->boot_start = BC_STORAGE_ROM_OFFCHIP;
 		bc->storage_bc = BC_STORAGE_ROM_OFFCHIP;
@@ -31,8 +29,6 @@ void plat_bc_fix(void)
 		bc->storage_online |= BC_STORAGE_FLASH_I;
 		bc->storage_fsbl = BC_STORAGE_RAM_ONCHIP;
 		bc->storage_opensbi = BC_STORAGE_DDR;
-		bc->flash_step_size = 1;
-		bc->enable_console = 0;
 	}
 
 	addr = (unsigned char *)PLAT_SYSCSR_SOCKET_ID;
@@ -169,7 +165,7 @@ void plat_serial_put_byte(unsigned char data)
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
 	volatile unsigned char *uart_base;
 
-	if (bc->enable_console == 0) return;
+	if ((bc->enable_bitmap & BC_ENABLE_CONSOLE) == 0) return;
 
 	if (bc->socket_id == 0) {
 		uart_base = (unsigned char *)PLAT_UART0_BASE;

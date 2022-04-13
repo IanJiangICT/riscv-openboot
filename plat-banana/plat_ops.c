@@ -20,7 +20,6 @@ void plat_bc_fix(void)
 		bc->boot_start = BC_STORAGE_ROM_ONCHIP;
 		bc->storage_bc = BC_STORAGE_ROM_ONCHIP;
 		bc->storage_fsbl = 0; // FSBL in RAM already
-		bc->enable_console = 0;
 	}
 
 	/* Always 1 socket */
@@ -110,7 +109,7 @@ void plat_serial_put_byte(unsigned char data)
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
 	volatile unsigned char *uart_base;
 
-	if (bc->enable_console == 0) return;
+	if ((bc->enable_bitmap & BC_ENABLE_CONSOLE) == 0) return;
 
 	uart_base = (unsigned char *)PLAT_UART0_BASE;
 	dw_uart_put_byte(uart_base, data);
