@@ -31,15 +31,23 @@ void zsbl_init_console(void)
 {
 	serial_init();
 	serial_print_byte('Z');
+#ifndef PRINT_SIMPLE
 	serial_print_byte('S');
 	serial_print_byte('B');
 	serial_print_byte('L');
 	serial_print_byte('\10');
 	serial_print_byte('\13');
+#endif
 	return;
 }
 
 void zsbl_print_bc(void)
 {
+	serial_print_byte('B');
+#ifndef PRINT_SIMPLE
+	serial_print_byte('C');
+	serial_print_byte('\10');
+	serial_print_byte('\13');
+#endif
 	return;
 }

@@ -3,7 +3,10 @@ include common.mk
 MC_CONFIG = -D CORE_TYPE_MC
 
 ifeq ($(CONF_ZSBL_PRINT), 1)
-CFLAGS += -D PRINT_ENABLE
+MC_CONFIG += -D PRINT_ENABLE
+ifeq ($(CONF_ZSBL_PRINT_SIMPLE), 1)
+MC_CONFIG += -D PRINT_SIMPLE
+endif
 endif
 
 elfs = $(BUILD_DIR)/zsbl_mc.elf
