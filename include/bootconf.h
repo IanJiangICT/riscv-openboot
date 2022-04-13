@@ -56,6 +56,26 @@ struct bootconf {
 	uint8_t uart_freq_div; 		/* Frequncy dividor after clock works */
 	uint8_t flash_freq_div0;
 	uint8_t flash_freq_div;
+/*
+ * About reading a flash:
+ * 1) Do the 1st reading (ZSBL in on-chip ROM reading bootconf1 with bootconf0)
+ *    under the lowest capability:
+ *    - This is indicated in bootconf0:
+ *        flash_step_size == 1, or
+ *        flash_capability == BC_SPI_DEFAULT
+ *    - Read 1 byte data each time with 3-byte-address only in the lower 16MB
+ *      memory space.
+ * 2) Do the 2nd reading (ZSBL reading FSBL and FSBL reading OpenSBI with
+ *    bootconf1) under the highest capability as far as possible:
+ *    - This is indicated in bootconf1:
+ *        flash_step_size > 1, and
+ *        flash_capability with BC_SPI_4BYTE_ADDR and BC_SPI_FAST_READ
+ *    - Fast read multiple bytes each time with 4-byte-address in the whole
+ *      memory space.
+ * 3) Keep under the lowest capability if either fast-read or 4-byte-address is
+ *    supported in the actural flash memory, which should be indicated in
+ *    bootconf1.
+ */
 	uint8_t flash_capability;	/* Combination of enum bc_spi */
 	uint8_t flash_step_size;	/* Data size in byte of each read (or write) when continuously
                                  * transfer is supported, which depends on the capability of the 
