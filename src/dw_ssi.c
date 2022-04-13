@@ -15,6 +15,7 @@ void dw_ssi_init(volatile unsigned char *ssi_base, unsigned int freq_div)
 	return;
 }
 
+#ifdef STORAGE_READ_ID
 void dw_ssi_jedec_id(volatile unsigned char *ssi_base, unsigned char *manufacturer, unsigned char *mem_type, unsigned char *capacity)
 {
 	uint32_t val;
@@ -42,6 +43,7 @@ void dw_ssi_jedec_id(volatile unsigned char *ssi_base, unsigned char *manufactur
 
 	return;
 }
+#endif
 
 void dw_ssi_read_byte(volatile unsigned char *ssi_base, unsigned int offset, unsigned char *buf, unsigned char addr_4bytes)
 {

@@ -176,6 +176,9 @@ mc_start:
 	call	fsbl_first_print
 	call	plat_power_init
 	call	plat_clock_init
+#ifdef STORAGE_PROBE
+	call	storage_probe
+#endif
 	call	plat_setup_pg
 	call	plat_ddrctrl_init
 #ifdef MC_ACTS_AS_PC
