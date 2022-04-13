@@ -1,23 +1,23 @@
 #ifndef BOOTCONF_H
 #define BOOTCONF_H
 
-#define BOOTCONF_SIZE_MAX	0x1000
-#define BOOTCONF_SOCKET_MAX 8
+/* XXX Make sure that sizeof(struct bootconf) <= BOOTCONF_SOCKET_MAX */
+#define BOOTCONF_SIZE_MAX	0x40
+#define BOOTCONF_SOCKET_MAX 2
 
 #ifndef __ASM__
 #include "simple_types.h"
 
 enum bc_storage {
-	BC_STORAGE_NONE       = 0x0000,
-	BC_STORAGE_ROM_ONCHIP = 0x0001,
-	BC_STORAGE_ROM_OFFCHIP= 0x0002,
-	BC_STORAGE_RAM_ONCHIP = 0x0004,
-	BC_STORAGE_RAM_OFFCHIP= 0x0008,
-	BC_STORAGE_DDR        = 0x0010,
-	BC_STORAGE_FLASH_0    = 0x0020, 	/* At the flash of socket 0 */
-	BC_STORAGE_FLASH_I    = 0x0040, 	/* At each flash of every socket */
-	BC_STORAGE_SD_0       = 0x0080,
-	BC_STORAGE_SD_I       = 0x0100,
+	BC_STORAGE_NONE       = 0x00,
+	BC_STORAGE_ROM_ONCHIP = 0x01,
+	BC_STORAGE_ROM_OFFCHIP= 0x02,
+	BC_STORAGE_RAM_ONCHIP = 0x04,
+	BC_STORAGE_DDR        = 0x08,
+	BC_STORAGE_FLASH_0    = 0x10, 	/* At the flash of socket 0 */
+	BC_STORAGE_FLASH_I    = 0x20, 	/* At each flash of every socket */
+	BC_STORAGE_SD_0       = 0x40,
+	BC_STORAGE_SD_I       = 0x80,
 };
 
 enum bc_work_mode {
@@ -28,29 +28,36 @@ enum bc_work_mode {
 };
 
 enum bc_spi {
-	BC_SPI_4BYTE_ADDR	= 0x0001,
-	BC_SPI_FAST_READ	= 0x0002,
+	BC_SPI_DEFAULT		= 0x00,
+	BC_SPI_4BYTE_ADDR	= 0x01,
+	BC_SPI_FAST_READ	= 0x02,
+};
+
+enum bc_enable {
+	BC_ENABLE_NONE		= 0x00,
+	BC_ENABLE_CONSOLE	= 0x01, /* Enable console output such as an UART */
+	BC_ENABLE_DDRCTRL	= 0x02, /* Enable DDR controller */
+	BC_ENABLE_CHIPLINK	= 0x04,	/* Enable chiplink between sockets */
+	BC_ENABLE_ALL		= 0xFF,
 };
 
 struct bootconf {
-	uint32_t conf_size;			/* Size in byte, including struct bootconf + following data */
-	uint32_t boot_start;
-	uint32_t work_mode;
-	uint32_t storage_online;	/* Bitmap of available storage types */
-	uint32_t storage_bc;
-	uint32_t storage_fsbl;
-	uint32_t storage_opensbi;
-	uint32_t enable_console;	/* Enable console output such as an UART */
-	uint32_t enable_ddrctrl;	/* Enable DDR controller */
-	uint32_t enable_chiplink;	/* Enable chiplink between sockets */
-	uint32_t socket_id;
-	uint32_t socket_cnt;
-	uint32_t uart_freq_div0;	/* Frequncy dividor default */
-	uint32_t uart_freq_div; 	/* Frequncy dividor after clock works */
-	uint32_t flash_freq_div0;
-	uint32_t flash_freq_div;
-	uint32_t flash_capability;	/* Other fucntions supported beside reading 1 byte data with 3-byte address */
-	uint32_t flash_step_size;	/* Data size in byte of each read (or write) when continuously
+	uint8_t conf_size;			/* Size in byte, including struct bootconf + following data */
+	uint8_t boot_start;
+	uint8_t work_mode;
+	uint8_t storage_online;		/* Bitmap of available storage types */
+	uint8_t storage_bc;
+	uint8_t storage_fsbl;
+	uint8_t storage_opensbi;
+	uint8_t enable_bitmap;
+	uint8_t socket_id;
+	uint8_t socket_cnt;
+	uint8_t uart_freq_div0;		/* Frequncy dividor default */
+	uint8_t uart_freq_div; 		/* Frequncy dividor after clock works */
+	uint8_t flash_freq_div0;
+	uint8_t flash_freq_div;
+	uint8_t flash_capability;	/* Combination of enum bc_spi */
+	uint8_t flash_step_size;	/* Data size in byte of each read (or write) when continuously
                                  * transfer is supported, which depends on the capability of the 
                                  * controller and the device. In fact, this is always supported
                                  * by actual flash chips, but might not be supported by some 

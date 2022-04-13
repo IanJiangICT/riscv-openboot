@@ -16,7 +16,7 @@ void zsbl_set_bc_rom(void)
 	/* Copy bootconf0 in ROM to RAM */
 	data_size = *((uint32_t *)ptr_src);
 	if (data_size <= 0 || data_size > BOOTCONF_SIZE_MAX) {
-		return;
+		data_size = BOOTCONF_SIZE_MAX;
 	}
 	for (i = 0; i < data_size; i += sizeof(uint32_t)) {
 		*((uint32_t *)(ptr_dst + i)) = *((uint32_t *)(ptr_src + i));
