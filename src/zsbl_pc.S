@@ -50,10 +50,10 @@ acts_as_mc:
 	bnez	t1, wait_funcs_end
 
 	call	zsbl_set_bc_rom
+	call	zsbl_init_console
 	call	storage_init
 	call	storage_probe
 	call	storage_load_bc
-	call	zsbl_init_console
 	call	zsbl_print_bc
 	call	storage_load_fsbl
 
