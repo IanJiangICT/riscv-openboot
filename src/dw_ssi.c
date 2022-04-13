@@ -7,8 +7,6 @@ void dw_ssi_init(volatile unsigned char *ssi_base, unsigned int freq_div)
 {
 	uint32_t val;
 	val = 0x00000000; writel(val, ssi_base + 0x08);	// Disable SSI
-	val = 0x000703C0; writel(val, ssi_base + 0x00);	// CTRLR0: DFS_32 = 0x07 (8-bit), FRF = 0x0 (MOTOROLA_SPI)
-	val = 0x00000000; writel(val, ssi_base + 0x04);	// CTRLR1: NDF = 0 (only 1 byte)
 	val = (uint32_t)freq_div;						// BAUDR: SCKDV is any even value between 2 and 65534
 	val = (val + 1) & 0x0000FFFE;
 					  writel(val, ssi_base + 0x14);
@@ -80,8 +78,7 @@ void dw_ssi_read_byte(volatile unsigned char *ssi_base, unsigned int offset, uns
 	return;
 }
 
-#ifdef FSBL_FUNC
-unsigned int dw_ssi_read_fast(volatile unsigned char *ssi_base, unsigned int offset, unsigned char *buf, unsigned int size)
+unsigned int dw_ssi_fast_read4ba(volatile unsigned char *ssi_base, unsigned int offset, unsigned char *buf, unsigned int size)
 {
 	uint32_t val;
 	unsigned int halfword_cnt;
@@ -121,4 +118,3 @@ unsigned int dw_ssi_read_fast(volatile unsigned char *ssi_base, unsigned int off
 
 	return (halfword_cnt << 1);
 }
-#endif
