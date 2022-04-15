@@ -117,14 +117,13 @@ void plat_serial_put_byte(unsigned char data)
 	return;
 }
 
-#ifdef FSBL_FUNC
 
-void plat_power_init(void) { return; }
-
+#if (!defined(CLOCK_IN_ZSBL) && !defined(FSBL_FUNC)) || (defined(CLOCK_IN_ZSBL) && defined (FSBL_FUNC))
+void plat_clock_init(void) { return; } /* Null opration */
+#else
 #define PLAT_CLK_BASE 0x4302000
 #define CLK_CONFIG_BASE (PLAT_CLK_BASE + 0x100)
 #define CLK_ENABLE_BASE (PLAT_CLK_BASE + 0x400)
-
 void plat_clock_init(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
@@ -236,7 +235,11 @@ skip_pll_config:
 	serial_print_str("clock ok\n");
 	return;
 }
+#endif
 
+#ifdef FSBL_FUNC
+
+void plat_power_init(void) { return; }
 void plat_start_pc(void) { return; }
 void plat_setup_pg(void) { return; }
 void plat_setup_sz(void) { return; }

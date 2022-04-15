@@ -8,11 +8,16 @@ void plat_sd_read_byte(unsigned int offset, unsigned char *buf) { return; }
 void plat_sd_read(unsigned int offset, unsigned char *buf, unsigned int size) { return; }
 void plat_serial_init(void) { return; }
 void plat_serial_put_byte(unsigned char data) { return; }
+#if (!defined(CLOCK_IN_ZSBL) && !defined(FSBL_FUNC)) || (defined(CLOCK_IN_ZSBL) && defined (FSBL_FUNC))
+void plat_clock_init(void) { return; } /* Null opration */
+#else
+void plat_clock_init(void) { return; } /* Clock driver */
+#endif
+#ifdef FSBL_FUNC
 void plat_power_init(void) { return; }
-void plat_clock_init(void) { return; }
 void plat_start_pc(void) { return; }
 void plat_setup_pg(void) { return; }
 void plat_setup_sz(void) { return; }
 void plat_ddrctrl_init(void) { return; }
 void plat_chiplink_init(void) { return; }
-
+#endif

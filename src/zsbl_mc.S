@@ -30,6 +30,9 @@ stack_setup:
 
 call_funcs:
 	call	zsbl_set_bc_rom
+#ifdef CLOCK_IN_ZSBL
+	call	plat_clock_init
+#endif
 	call	zsbl_init_console
 	call	storage_init
 #ifdef STORAGE_PROBE
