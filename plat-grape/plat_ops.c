@@ -133,15 +133,90 @@ void plat_clock_init(void)
 	uint32_t addr_h = 0;
 	int i;
 	static uint32_t conf_addr_val [] = {
+		/* SoC */
+		0x01000000 + 0x120,  500000,
+		0x01000000 + 0x124,  100000,
+		/* CCN */
+		0x41000000 + 0x020, 1500000,
+		0x41000000 + 0x024,       0,
+		/* PC Cluster 0 - 3 */
+		0x40000000 + 0x020, 2000000,
+		0x40000000 + 0x024,       0,
+		0x40100000 + 0x020, 2000000,
+		0x40100000 + 0x024,       0,
+		0x40200000 + 0x020, 2000000,
+		0x40200000 + 0x024,       0,
+		0x40300000 + 0x020, 2000000,
+		0x40300000 + 0x024,       0,
+		/* PC Cluster 4 - 7 */
+		0x48000000 + 0x020, 2000000,
+		0x48000000 + 0x024,       0,
+		0x48100000 + 0x020, 2000000,
+		0x48100000 + 0x024,       0,
+		0x48200000 + 0x020, 2000000,
+		0x48200000 + 0x024,       0,
+		0x48300000 + 0x020, 2000000,
+		0x48300000 + 0x024,       0,
 	};
-	static uint32_t enable_addr_val [] = {
+	static uint32_t start_addr_val [] = {
+		/* SoC */
+		0x01000000 + 0x118, 0x00000002,
+		/* CCN */
+		0x41000000 + 0x018, 0x00000002,
+		/* PC Cluster 0 - 3 */
+		0x40000000 + 0x018, 0x00000002,
+		0x40100000 + 0x018, 0x00000002,
+		0x40200000 + 0x018, 0x00000002,
+		0x40300000 + 0x018, 0x00000002,
+		/* PC Cluster 4 - 7 */
+		0x48000000 + 0x018, 0x00000002,
+		0x48100000 + 0x018, 0x00000002,
+		0x48200000 + 0x018, 0x00000002,
+		0x48300000 + 0x018, 0x00000002,
+	};
+	static uint32_t wait_addr_val [] = {
+		/* SoC */
+		0x01000000 + 0x118, 0x00010000,
+		/* CCN */
+		0x41000000 + 0x018, 0x00010000,
+		/* PC Cluster 0 - 3 */
+		0x40000000 + 0x018, 0x00010000,
+		0x40100000 + 0x018, 0x00010000,
+		0x40200000 + 0x018, 0x00010000,
+		0x40300000 + 0x018, 0x00010000,
+		/* PC Cluster 4 - 7 */
+		0x48000000 + 0x018, 0x00010000,
+		0x48100000 + 0x018, 0x00010000,
+		0x48200000 + 0x018, 0x00010000,
+		0x48300000 + 0x018, 0x00010000,
+	};
+	static uint32_t switch_addr_val [] = {
+		/* SoC */
+		0x01000000 + 0x200, 0,
+		/* CCN */
+		0x41000000 + 0x040, 0,
+		/* PC Cluster 0 - 3 */
+		0x40000000 + 0x040, 2,
+		0x40100000 + 0x040, 2,
+		0x40200000 + 0x040, 2,
+		0x40300000 + 0x040, 2,
+		/* PC Cluster 4 - 7 */
+		0x48000000 + 0x040, 2,
+		0x48100000 + 0x040, 2,
+		0x48200000 + 0x040, 2,
+		0x48300000 + 0x040, 2,
 	};
 	static uint32_t reset_addr_val [] = {
+		0x43100000 + 0x090, 0x0B, /* DDR AXI */
+		0x4A100000 + 0x090, 0x0B, /* DDR AXI */
 	};
 	
+#ifdef CLOCK_IN_ZSBL
+	/* Do NOT print as UART is not ready */
+#else
 	serial_print_str("clock init\n");
+#endif
 
-	/* Get higher address based on Socket ID */
 	uart_base = (unsigned char *)PLAT_UART0_BASE;
 	ssi_base = (unsigned char *)PLAT_SSI0_BASE;
 
@@ -150,19 +225,26 @@ void plat_clock_init(void)
 		goto skip_pll_config;
 	}
 
-	/* Write to each PLL to configure */
+	/* Configure frequencies to each PLL */
 	for (i = 0; i < sizeof(conf_addr_val)/sizeof(uint32_t); i += 2) {
 		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)conf_addr_val[i]));
 		val = conf_addr_val[i + 1];
 		writel(val, addr);
 	}
 
+	/* Start each PLL */
+	for (i = 0; i < sizeof(start_addr_val)/sizeof(uint32_t); i += 2) {
+		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)start_addr_val[i]));
+		val = start_addr_val[i + 1];
+		writel(val, addr);
+	}
+
 	/* Read each PLL to wait */
-	for (i = 0; i < sizeof(conf_addr_val)/sizeof(uint32_t); i += 2) {
-		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)conf_addr_val[i]));
+	for (i = 0; i < sizeof(wait_addr_val)/sizeof(uint32_t); i += 2) {
+		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)wait_addr_val[i]));
 		do {
 			val = readl(addr);
-		} while (val & 0x10000);
+		} while (val & wait_addr_val[i + 1]);
 	}
 
 skip_pll_config:
@@ -174,9 +256,9 @@ skip_pll_config:
 	}
 
 	/* Switch to PLL clocks */
-	for (i = 0; i < sizeof(enable_addr_val)/sizeof(uint32_t); i += 2) {
-		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)enable_addr_val[i]));
-		val = enable_addr_val[i + 1];
+	for (i = 0; i < sizeof(switch_addr_val)/sizeof(uint32_t); i += 2) {
+		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)switch_addr_val[i]));
+		val = switch_addr_val[i + 1];
 		writel(val, addr);
 	}
 
@@ -184,7 +266,11 @@ skip_pll_config:
 	dw_uart_init(uart_base, bc->uart_freq_div);
 	dw_ssi_init(ssi_base, bc->flash_freq_div);
 
+#ifdef CLOCK_IN_ZSBL
+	serial_print_byte('C');
+#else
 	serial_print_str("clock ok\n");
+#endif
 	return;
 }
 #endif
