@@ -35,6 +35,9 @@ _start:
 pc_acts_as_mc:
 	/* Only one PC (with hartid = 0) per socket acts as MC */
 	/* No need to set up partial-good */
+	csrr	t0,	mhartid
+	andi	t0,	t0,	SOC_CORE_HARTID_MASK_SOCKET
+	bnez	t0,	pc_start
 	call	fsbl_first_print
 	call	plat_power_init
 	call	plat_clock_init
