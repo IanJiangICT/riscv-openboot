@@ -43,7 +43,7 @@ struct bootconf bootconf0 = {
 #else
 	/* For off-chip ZSBL, bus frequency is switched to PLL clock (100MHz for example)
 	 * before the 1st initiating of these devices. */
-	.uart_freq_div0	= 81,	// 76800 under 25MHz
+	.uart_freq_div0	= 81,	// 76800 under 100MHz
 	.flash_freq_div0= 4,	// 25MHz under 100MHz
 #endif
 	.uart_freq_div	= 81,	// 76800 under 100MHz
