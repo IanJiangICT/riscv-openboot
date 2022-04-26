@@ -21,10 +21,18 @@ enum bc_storage {
 };
 
 enum bc_work_mode {
-	BC_WORK_MODE_PRODUCT = 0,
-	BC_WORK_MODE_DIAGNOSIS,
-	BC_WORK_MODE_VVCS,		/* Verification with VCS */
-	BC_WORK_MODE_VZEBU,		/* Verification with Zebu */
+	/* bits[1:0] */
+	BC_WORK_MODE_PRODUCT = 0x00,
+	BC_WORK_MODE_BIST	 = 0x01,
+	BC_WORK_MODE_DEBUG   = 0x02,
+	/* bits[3:2] */
+	BC_WORK_MODE_VNULL   = 0x00 << 2,	/* Null (not) Verification */
+	BC_WORK_MODE_VVCS    = 0x01 << 2,	/* Verification with VCS */
+	BC_WORK_MODE_VZEBU   = 0x02 << 2,	/* Verification with Zebu */
+	/* bits[7:4] */
+	BC_WORK_MODE_BIST_ZSBL	 = 0x01 << 4,
+	BC_WORK_MODE_BIST_FSBL	 = 0x01 << 5,
+	BC_WORK_MODE_BIST_PLAT	 = 0x01 << 6,
 };
 
 enum bc_spi {
