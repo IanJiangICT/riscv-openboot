@@ -3,6 +3,8 @@
 #include "storage_def.h"
 #include "plat_def.h"
 
+#define DW_SSI_WAIT_POLL_CNT_MAX 1024
+
 void dw_ssi_init(volatile unsigned char *ssi_base, unsigned int freq_div)
 {
 	uint32_t val;
@@ -15,10 +17,11 @@ void dw_ssi_init(volatile unsigned char *ssi_base, unsigned int freq_div)
 	return;
 }
 
-#ifdef STORAGE_READ_ID
 void dw_ssi_jedec_id(volatile unsigned char *ssi_base, unsigned char *manufacturer, unsigned char *mem_type, unsigned char *capacity)
 {
 	uint32_t val;
+	int poll_cnt = 0;
+
 	val = 0x00000000; writel(val, ssi_base + 0x08);	// Disable SSI
 	val = 0x000703C0; writel(val, ssi_base + 0x00);	// CTRLR0: DFS_32 = 0x07 (8-bit), FRF = 0x0 (MOTOROLA_SPI)
 	val = 0x00000002; writel(val, ssi_base + 0x04);	// CTRLR1: NDF = 2
@@ -31,19 +34,29 @@ void dw_ssi_jedec_id(volatile unsigned char *ssi_base, unsigned char *manufactur
 	val = 0x00000001; writel(val, ssi_base + 0x10);	// Enable slave to start TX
 
 	/* Wait until RX FIFO is full: RISR.RXFIR = 1 */
-	do { val = readl(ssi_base + 0x34); } while ((val & 0x10) == 0);
+	do {
+		val = readl(ssi_base + 0x34);
+		poll_cnt++;
+		if (poll_cnt >= DW_SSI_WAIT_POLL_CNT_MAX) break;
+	} while ((val & 0x10) == 0);
 
-	/* Get data received */
-	val = readl(ssi_base + 0x60); *manufacturer = val & 0xFF;
-	val = readl(ssi_base + 0x60); *mem_type     = val & 0xFF;
-	val = readl(ssi_base + 0x60); *capacity     = val & 0xFF;
+	if (poll_cnt >= DW_SSI_WAIT_POLL_CNT_MAX) {
+		/* Returned value when timeout */
+		*manufacturer = 0x00;
+		*mem_type = 0x00;
+		*capacity = 0x00;
+	} else {
+		/* Get data received */
+		val = readl(ssi_base + 0x60); *manufacturer = val & 0xFF;
+		val = readl(ssi_base + 0x60); *mem_type     = val & 0xFF;
+		val = readl(ssi_base + 0x60); *capacity     = val & 0xFF;
+	}
 
 	/* Disable slave */
 	val = 0x00000000; writel(val, ssi_base + 0x10);	// Disable slave
 
 	return;
 }
-#endif
 
 void dw_ssi_read_byte(volatile unsigned char *ssi_base, unsigned int offset, unsigned char *buf, unsigned char addr_4bytes)
 {
