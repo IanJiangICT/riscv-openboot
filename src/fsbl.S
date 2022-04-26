@@ -44,6 +44,10 @@ pc_acts_as_mc:
 	call	plat_ddrctrl_init
 #endif
 
+#ifdef FSBL_BIST
+	call	fsbl_run_bist
+#endif
+
 /* 
  * PC flow
  */
