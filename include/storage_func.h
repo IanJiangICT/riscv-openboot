@@ -20,6 +20,9 @@ void storage_load_opensbi(void);
 #ifdef STORAGE_PROBE
 int storage_probe(void);
 #endif
+#if defined(ZSBL_BIST) || defined(FSBL_BIST)
+void storage_bist(void);
+#endif
 
 #endif
 

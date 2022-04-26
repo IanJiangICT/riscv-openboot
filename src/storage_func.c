@@ -190,3 +190,63 @@ void storage_load_opensbi(void)
 	gpt_load_part(GPT_PART_OPENSBI, dst, bc->storage_opensbi);
 	return;
 }
+
+#if defined(ZSBL_BIST) || defined(FSBL_BIST)
+void storage_bist(void)
+{
+	unsigned char m, t, c;
+	uint32_t v;
+	int ret;
+
+	plat_serial_init();
+	plat_serial_put_byte('T');
+	plat_serial_put_byte('f');
+#ifndef PRINT_SIMPLE
+	plat_serial_put_byte('l');
+	plat_serial_put_byte('a');
+	plat_serial_put_byte('s');
+	plat_serial_put_byte('h');
+	plat_serial_put_byte(':');
+#endif
+
+	plat_serial_put_byte(' ');
+	m = t = c = 0xFF;
+	plat_flash_identify(&m, &t, &c);
+	v = m << 16 | t << 8 | c;
+#ifdef PRINT_SIMPLE
+	if (v == 0) {
+		c = '0';
+	} else {
+		c = '1';
+	}
+	plat_serial_put_byte(c);
+#else
+	serial_print_str("dev-id ");
+	serial_print_hex_u32(v);
+#endif
+
+	plat_serial_put_byte(' ');
+	ret = storage_probe();
+#ifdef PRINT_SIMPLE
+	if (ret != 0) {
+		c = '0';
+	} else {
+		c = '1';
+	}
+	plat_serial_put_byte(c);
+#else
+	serial_print_str("part-0: ");
+	if (ret != 0) {
+		serial_print_str("invalid");
+	} else {
+		serial_print_str("ok");
+	}
+#endif
+
+#ifndef PRINT_SIMPLE
+	plat_serial_put_byte('\10');
+	plat_serial_put_byte('\13');
+#endif
+	return;
+}
+#endif
