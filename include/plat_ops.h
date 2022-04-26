@@ -22,6 +22,7 @@
 #else
 void plat_bc_fix(void);
 void plat_flash_init(void);
+void plat_flash_identify(unsigned char *m, unsigned char *t, unsigned char *c);
 void plat_flash_read_byte(unsigned int offset, unsigned char *buf);
 void plat_flash_read(unsigned int offset, unsigned char *buf, unsigned int size);
 void plat_sd_init(void);

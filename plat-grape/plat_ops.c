@@ -40,16 +40,19 @@ void plat_flash_init(void)
 {
 	struct bootconf *bc = (struct bootconf *)PLAT_RAM_BC;
 	volatile unsigned char *ssi_base;
-	uint32_t val;
-	unsigned char m, t, c;
 
 	/* Initiate SSI0 */
 	ssi_base = (unsigned char *)PLAT_SSI0_BASE;
 	dw_ssi_init(ssi_base, bc->flash_freq_div0);
-#ifdef STORAGE_READ_ID
-	dw_ssi_jedec_id(ssi_base, &m, &t, &c);
-#endif
 
+	return;
+}
+
+void plat_flash_identify(unsigned char *m, unsigned char *t, unsigned char *c)
+{
+	volatile unsigned char *ssi_base;
+	ssi_base = (unsigned char *)PLAT_SSI0_BASE;
+	dw_ssi_jedec_id(ssi_base, m, t, c);
 	return;
 }
 
