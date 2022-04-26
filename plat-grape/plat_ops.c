@@ -13,18 +13,20 @@ void plat_bc_fix(void)
 	addr = (unsigned char *)PLAT_SYSCSR_BOOT_MODE;
 	val = readl(addr);
 	val &= 0x0000000F;
-	if (val == PLAT_BOOTMODE_SIM_SSI || val == PLAT_BOOTMODE_SIM_SD) {
+	if (val == PLAT_BOOTMODE_DEBUG) {
+		bc->work_mode = BC_WORK_MODE_DEBUG;
 		bc->boot_start = BC_STORAGE_ROM_ONCHIP;
 		bc->storage_bc = BC_STORAGE_ROM_ONCHIP;
 		bc->storage_online |= BC_STORAGE_ROM_ONCHIP;
 		bc->storage_online |= BC_STORAGE_RAM_ONCHIP;
-		if (val == PLAT_BOOTMODE_SIM_SSI) {
-			bc->storage_online |= BC_STORAGE_FLASH_I;
-		} else {
-			bc->storage_online |= BC_STORAGE_SD_I;
-		}
+		bc->storage_online |= BC_STORAGE_DDR;
+		bc->storage_online |= BC_STORAGE_FLASH_I;
 		bc->storage_fsbl = BC_STORAGE_RAM_ONCHIP;
 		bc->storage_opensbi = BC_STORAGE_DDR;
+	} else if (val == PLAT_BOOTMODE_BIST) {
+		bc->work_mode = BC_WORK_MODE_BIST | BC_WORK_MODE_BIST_ZSBL
+						| BC_WORK_MODE_BIST_FSBL
+						| BC_WORK_MODE_BIST_PLAT;
 	}
 
 	/* TODO Get socket count from system register */
