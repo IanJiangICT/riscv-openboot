@@ -327,3 +327,25 @@ void serial_print_hex_u32(uint32_t v)
 	return;
 }
 #endif
+
+#if defined(ZSBL_BIST) || defined(FSBL_BIST)
+void serial_bist(void)
+{
+	plat_serial_init();
+	plat_serial_put_byte('T');
+	plat_serial_put_byte('s');
+#ifndef PRINT_SIMPLE
+	plat_serial_put_byte('e');
+	plat_serial_put_byte('r');
+	plat_serial_put_byte('i');
+	plat_serial_put_byte('a');
+	plat_serial_put_byte('l');
+	plat_serial_put_byte(':');
+	plat_serial_put_byte('O');
+	plat_serial_put_byte('K');
+	plat_serial_put_byte('\10');
+	plat_serial_put_byte('\13');
+#endif
+	return;
+}
+#endif

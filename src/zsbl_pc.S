@@ -50,6 +50,9 @@ acts_as_mc:
 	bnez	t1, wait_funcs_end
 
 	call	zsbl_set_bc_rom
+#ifdef ZSBL_BIST
+	call	zsbl_run_bist
+#endif
 #ifdef CLOCK_IN_ZSBL
 	call	plat_clock_init
 #endif
