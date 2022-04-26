@@ -4,6 +4,13 @@ CFLAGS+=-D FSBL_FUNC
 
 ifeq ($(CONF_FSBL_PRINT), 1)
 CFLAGS += -D PRINT_ENABLE
+ifeq ($(CONF_FSBL_PRINT_SIMPLE), 1)
+CFLAGS += -D PRINT_SIMPLE
+endif
+endif
+
+ifeq ($(CONF_FSBL_BIST), 1)
+CFLAGS += -D FSBL_BIST
 endif
 
 elfs = $(BUILD_DIR)/fsbl.elf

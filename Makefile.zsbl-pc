@@ -9,6 +9,10 @@ PC_CONFIG += -D PRINT_SIMPLE
 endif
 endif
 
+ifeq ($(CONF_ZSBL_BIST), 1)
+PC_CONFIG += -D ZSBL_BIST
+endif
+
 elfs = $(BUILD_DIR)/zsbl_pc.elf
 
 ld_pc = $(BUILD_DIR)/zsbl_pc.ld
