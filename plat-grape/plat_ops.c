@@ -225,11 +225,6 @@ void plat_clock_init(void)
 	uart_base = (unsigned char *)PLAT_UART0_BASE;
 	ssi_base = (unsigned char *)PLAT_SSI0_BASE;
 
-	/* No need to configure PLL over Zebu */
-	if (bc->work_mode == BC_WORK_MODE_VZEBU) {
-		goto skip_pll_config;
-	}
-
 	/* Configure frequencies to each PLL */
 	for (i = 0; i < sizeof(conf_addr_val)/sizeof(uint32_t); i += 2) {
 		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)conf_addr_val[i]));
@@ -252,7 +247,6 @@ void plat_clock_init(void)
 		} while (val & wait_addr_val[i + 1]);
 	}
 
-skip_pll_config:
 	/* Release resets excluding PC cores */
 	for (i = 0; i < sizeof(reset_addr_val)/sizeof(uint32_t); i += 2) {
 		addr = (unsigned char *)((((uint64_t)addr_h) << 32) | ((uint64_t)reset_addr_val[i]));
