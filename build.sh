@@ -99,6 +99,7 @@ ls -l $build_dir/*rom*hex*
 
 ram_elfs="fsbl.elf"
 ram_elfs="$ram_elfs bc1-vcs.elf"
+ram_elfs="$ram_elfs bc1-zebu.elf"
 echo "Build RAM binary and hex files for $ram_elfs"
 for f in $ram_elfs
 do

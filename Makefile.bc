@@ -2,6 +2,7 @@ include common.mk
 
 elfs = $(BUILD_DIR)/bootconf0.elf
 elfs += $(BUILD_DIR)/bc1-vcs.elf
+elfs += $(BUILD_DIR)/bc1-zebu.elf
 
 c_objs = $(elfs:elf=o)
 

@@ -1,5 +1,5 @@
 /*
- * The build-in one for VCS simulation 
+ * The build-in one for Zebu simulation 
  */
 
 #include "bootconf.h"
@@ -14,7 +14,10 @@
 #define THIS_STORAGE_FSBL 		BC_STORAGE_RAM_ONCHIP
 #define THIS_STORAGE_OPENSBI	BC_STORAGE_DDR
 #define THIS_BOOT_START			BC_STORAGE_ROM_ONCHIP
-#define THIS_ENABLE_BITMAP 		BC_ENABLE_NONE
+#define THIS_ENABLE_BITMAP 		( BC_ENABLE_NONE \
+	| BC_ENABLE_CONSOLE \
+	| BC_ENABLE_DDRCTRL \
+	)
 #define THIS_FLASH_CAP			( BC_SPI_DEFAULT \
 	| BC_SPI_4BYTE_ADDR \
 	| BC_SPI_FAST_READ \
@@ -33,8 +36,8 @@ struct bootconf bootconf1 = {
 	.socket_cnt		= THIS_SOCKET_CNT,
 	.uart_freq_div0	= 1,	// Max baud under 25MHz
 	.flash_freq_div0= 2,	// 12.5MHz under 25MHz
-	.uart_freq_div	= 81,	// 76800 under 100MHz
-	.flash_freq_div	= 4,	// 25MHz under 100MHz
+	.uart_freq_div	= 1,	// 6250000 under 100MHz
+	.flash_freq_div	= 2,	// 50MHz under 100MHz
 	.flash_capability = THIS_FLASH_CAP,
 	.flash_step_size  = THIS_FLASH_STEP,
 	.pg_codes = {
