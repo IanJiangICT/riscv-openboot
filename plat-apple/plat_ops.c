@@ -13,14 +13,19 @@ void plat_bc_fix(void)
 	addr = (unsigned char *)PLAT_SYSCSR_BOOT_MODE;
 	val = readl(addr);
 	val &= 0x0000000F;
-	if (val == PLAT_BOOTMODE_SIM_MC || val == PLAT_BOOTMODE_SIM_PC) {
+	if (val == PLAT_BOOTMODE_DEBUG) {
 		bc->boot_start = BC_STORAGE_ROM_ONCHIP;
 		bc->storage_bc = BC_STORAGE_ROM_ONCHIP;
 		bc->storage_online |= BC_STORAGE_ROM_ONCHIP;
 		bc->storage_online |= BC_STORAGE_RAM_ONCHIP;
+		bc->storage_online |= BC_STORAGE_DDR;
 		bc->storage_online |= BC_STORAGE_FLASH_I;
 		bc->storage_fsbl = BC_STORAGE_RAM_ONCHIP;
 		bc->storage_opensbi = BC_STORAGE_DDR;
+	} else if (val == PLAT_BOOTMODE_BIST) {
+		bc->work_mode = BC_WORK_MODE_BIST | BC_WORK_MODE_BIST_ZSBL
+						| BC_WORK_MODE_BIST_FSBL
+						| BC_WORK_MODE_BIST_PLAT;
 	} else if (val == PLAT_BOOTMODE_SIM_MC_OFFCHIP || val == PLAT_BOOTMODE_SIM_PC_OFFCHIP) {
 		bc->boot_start = BC_STORAGE_ROM_OFFCHIP;
 		bc->storage_bc = BC_STORAGE_ROM_OFFCHIP;
@@ -72,6 +77,14 @@ void plat_flash_init(void)
 	}
 	dw_ssi_init(ssi_base, bc->flash_freq_div0);
 
+	return;
+}
+
+void plat_flash_identify(unsigned char *m, unsigned char *t, unsigned char *c)
+{
+	volatile unsigned char *ssi_base;
+	ssi_base = (unsigned char *)PLAT_SSI0_BASE;
+	dw_ssi_jedec_id(ssi_base, m, t, c);
 	return;
 }
 
