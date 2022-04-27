@@ -103,7 +103,6 @@ void storage_init(void)
 	return;
 }
 
-#ifdef STORAGE_PROBE
 /*
  * Read GUID type of the 1st GPT partition.
  */
@@ -151,9 +150,6 @@ int storage_probe(void)
 	}
 	return 0;
 }
-#else
-int storage_probe(void) { return 0; }
-#endif
 
 void storage_load_bc(void)
 {
